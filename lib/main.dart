@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gradus/src/features/unauth/presentation/registration_page.dart';
 
-void main() {
+void main() async {
+  // await Firebase.initializeApp();
   runApp(MyApp());
 }
 
