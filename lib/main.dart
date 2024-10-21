@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gradus/src/features/unauth/presentation/registration_page.dart';
+import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
+import 'package:gradus/src/features/unauth/presentation/sign_up_page.dart';
 
 void main() async {
   // await Firebase.initializeApp();
@@ -11,8 +12,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: RegistrationPage(),
+    return SafeArea(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: LogInPage(),
+      ),
     );
   }
 }
