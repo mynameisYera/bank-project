@@ -30,7 +30,7 @@ class CurrentBookWidget extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(6),
                 image: DecorationImage(
-                    image: AssetImage(image), fit: BoxFit.cover)),
+                    image: NetworkImage(image), fit: BoxFit.cover)),
           ),
           SizedBox(
             width: 15,

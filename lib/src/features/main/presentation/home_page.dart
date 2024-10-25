@@ -5,8 +5,8 @@ import 'package:gradus/src/features/main/widgets/current_book_widget.dart';
 import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 
-class MainPage extends StatelessWidget {
-  const MainPage({super.key});
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +19,8 @@ class MainPage extends StatelessWidget {
     final Map<String, dynamic> currentBook = {
       'bookName': 'Shoko Alem',
       'page': 343,
-      'image': '',
+      'image':
+          'https://simg.marwin.kz/media/catalog/product/cache/8d1771fdd19ec2393e47701ba45e606d/f/u/fullimage_68_1.jpg',
     };
     return Scaffold(
       backgroundColor: AppColors.mainColor,
@@ -92,6 +93,19 @@ class MainPage extends StatelessWidget {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+          backgroundColor: AppColors.mainColor,
+          selectedItemColor: Colors.white,
+          items: [
+            BottomNavigationBarItem(
+                icon: Image.asset(
+                  'assets/images/home.png',
+                  width: 21,
+                ),
+                label: 'Home'),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
+          ]),
     );
   }
 }
