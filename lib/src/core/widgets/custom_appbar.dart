@@ -1,38 +1,44 @@
 import 'package:flutter/material.dart';
+import 'package:gradus/src/core/theme/text_theme.dart';
 
-import '../theme/text_theme.dart';
-
-class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppbar({
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final Color backgroundColor;
+  final List<Widget>? actions;
+  final bool popAble;
+  const CustomAppBar({
     super.key,
     required this.title,
-    required this.leadingIcon,
+    required this.backgroundColor,
+    this.actions,
+    required this.popAble,
   });
-  final String title;
-  final bool leadingIcon;
-
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      leading: leadingIcon
-          ? IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(
-                Icons.arrow_back_ios_new_outlined,
-                color: Colors.white,
-              ))
-          : null,
-      backgroundColor: Colors.transparent,
       title: Text(
-        "Log in or sign Up",
+        title,
         style: TextStyles.headerText,
       ),
+      leading: popAble
+          ? IconButton(
+              icon: const Icon(
+                Icons.arrow_back_ios_new,
+                color: Colors.white,
+              ),
+              iconSize: 16,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          : const SizedBox(),
       centerTitle: true,
+      surfaceTintColor: backgroundColor,
+      backgroundColor: backgroundColor,
+      actions: actions,
     );
   }
 
   @override
-  Size get preferredSize => const Size(double.maxFinite, 60);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

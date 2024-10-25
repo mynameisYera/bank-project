@@ -25,6 +25,7 @@ flutter:
 
   assets:
     - assets/icons/google_icon.png
+    - assets/images/Frame.png
   # fonts:
   #   - family: Schyler
   #     fonts:

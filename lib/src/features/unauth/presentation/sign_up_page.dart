@@ -38,7 +38,11 @@ class _SignUpPageState extends State<SignUpPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.mainColor,
-      appBar: const CustomAppbar(title: 'Finish signing up', leadingIcon: true),
+      appBar: const CustomAppBar(
+        title: 'Finish signing up',
+        backgroundColor: AppColors.mainColor,
+        popAble: true,
+      ),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(

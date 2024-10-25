@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gradus/src/features/main/presentation/main_page.dart';
 import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
 import 'package:gradus/src/features/unauth/presentation/sign_up_page.dart';
 
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
     return SafeArea(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: LogInPage(),
+        home: MainPage(),
       ),
     );
   }
