@@ -3,6 +3,7 @@ import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/widgets/custom_appbar.dart';
 import 'package:gradus/src/core/widgets/custom_button.dart';
 import 'package:gradus/src/core/widgets/custom_text_field.dart';
+import 'package:gradus/src/features/main/presentation/pages/main_page.dart';
 import 'package:gradus/src/features/unauth/presentation/sign_up_page.dart';
 
 import '../../../core/theme/text_theme.dart';
@@ -34,69 +35,79 @@ class _LogInPageState extends State<LogInPage> {
         backgroundColor: AppColors.mainColor,
         popAble: false,
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // name of the team
-              Text(
-                'Name of the Team',
-                style: TextStyles.headerText,
-              ),
-              const SizedBox(height: 5),
-              CustomTextField(
-                controller: _teamController,
-                hintText: 'F troishniki',
-                obscure: false,
-              ),
-              const SizedBox(height: 10),
-
-              // password
-              Text(
-                'Password',
-                style: TextStyles.headerText,
-              ),
-              const SizedBox(height: 5),
-              CustomTextField(
-                controller: _passwordController,
-                hintText: 'Password',
-                obscure: true,
-              ),
-              const SizedBox(height: 5),
-              Text(
-                'Forgot your password?',
-                style: TextStyles.miniText,
-              ),
-              const SizedBox(height: 20),
-
-              // continue button
-              CustomButton(onTap: () {}, btnText: 'Continue'),
-              const SizedBox(height: 20),
-
-              Row(
+      body: SingleChildScrollView(
+        child: Container(
+          height: MediaQuery.of(context).size.height - 50,
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  // name of the team
                   Text(
-                    'You are not registered, ',
+                    'Name of the Team',
+                    style: TextStyles.headerText,
+                  ),
+                  const SizedBox(height: 5),
+                  CustomTextField(
+                    controller: _teamController,
+                    hintText: 'F troishniki',
+                    obscure: false,
+                  ),
+                  const SizedBox(height: 10),
+
+                  // password
+                  Text(
+                    'Password',
+                    style: TextStyles.headerText,
+                  ),
+                  const SizedBox(height: 5),
+                  CustomTextField(
+                    controller: _passwordController,
+                    hintText: 'Password',
+                    obscure: true,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    'Forgot your password?',
                     style: TextStyles.miniText,
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => SignUpPage()));
-                    },
-                    child: Text(
-                      'Regisration',
-                      style: TextStyles.underlineText,
-                    ),
+                  const SizedBox(height: 20),
+
+                  // continue button
+                  CustomButton(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => NavPage()));
+                      },
+                      btnText: 'Continue'),
+                  const SizedBox(height: 20),
+
+                  Row(
+                    children: [
+                      Text(
+                        'You are not registered, ',
+                        style: TextStyles.miniText,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => SignUpPage()));
+                        },
+                        child: Text(
+                          'Regisration',
+                          style: TextStyles.underlineText,
+                        ),
+                      )
+                    ],
                   )
                 ],
-              )
-            ],
+              ),
+            ),
           ),
         ),
       ),

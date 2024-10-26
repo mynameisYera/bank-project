@@ -55,6 +55,7 @@ class HomePage extends StatelessWidget {
               SizedBox(
                 height: (77 * 3) + (20 * 3),
                 child: ListView.builder(
+                    physics: NeverScrollableScrollPhysics(),
                     itemCount: voteTile.length,
                     itemBuilder: (context, index) {
                       return VoteTileWidget(
@@ -93,19 +94,6 @@ class HomePage extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-          backgroundColor: AppColors.mainColor,
-          selectedItemColor: Colors.white,
-          items: [
-            BottomNavigationBarItem(
-                icon: Image.asset(
-                  'assets/images/home.png',
-                  width: 21,
-                ),
-                label: 'Home'),
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'home'),
-          ]),
     );
   }
 }
