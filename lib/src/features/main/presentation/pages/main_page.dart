@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gradus/main.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/theme/text_theme.dart';
 import 'package:gradus/src/core/widgets/custom_appbar.dart';
+import 'package:gradus/src/core/widgets/custom_button.dart';
 import 'package:gradus/src/features/main/presentation/bloc/message_bloc/message_bloc.dart';
 import 'package:gradus/src/features/main/widgets/current_book_widget.dart';
 import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
@@ -10,6 +13,7 @@ import 'package:gradus/src/features/main/widgets/message_send_field.dart';
 import 'package:gradus/src/features/main/widgets/message_tile_widget.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
 
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
@@ -154,7 +158,12 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class LeaderboardPage extends StatelessWidget {
+class LeaderboardPage extends StatefulWidget {
+  @override
+  State<LeaderboardPage> createState() => _LeaderboardPageState();
+}
+
+class _LeaderboardPageState extends State<LeaderboardPage> {
   @override
   Widget build(BuildContext context) {
     return Center(child: Text("Leaderboard Page"));
@@ -167,6 +176,28 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot snapshot =
+          await _firestore.collection('users').doc(user.uid).get();
+      setState(() {
+        userData = snapshot.data() as Map<String, dynamic>?;
+      });
+    }
+  }
+
   final TextEditingController _messageController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -178,80 +209,152 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: AppColors.mainColor,
         popAble: false,
       ),
-      body: BlocProvider(
-        create: (context) => MessageBloc()..add(LoadMessagesEvent()),
-        child: BlocBuilder<MessageBloc, MessageState>(
-          builder: (context, state) {
-            if (state is LoadingMessageState) {
-              return Center(child: CircularProgressIndicator());
-            } else if (state is FailureMessageState) {
-              return Center(child: Text('Error: ${state.error}'));
-            } else if (state is SuccessMessageState) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: ListView.builder(
-                        reverse: true,
-                        itemCount: state.items.length,
-                        itemBuilder: (context, index) {
-                          final message = state.items[index];
-                          return MessageTileWidget(
-                            username: message.username,
-                            message: message.messages,
-                          );
-                        },
-                      ),
-                    ),
-                    MessageInputField(
-                      formKey: _formKey,
-                      controller: _messageController,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Write something, please';
-                        }
-                        return null;
-                      },
-                      onPressed: () async {
-                        if (_formKey.currentState?.validate() ?? false) {
-                          try {
-                            await FirebaseFirestore.instance
-                                .collection('chat')
-                                .add({
-                              'message': _messageController.text,
-                              'username': 'yernarip'
-                            });
-                            _messageController.clear();
+      body: userData == null
+          ? Center(
+              child: CircularProgressIndicator(
+              color: AppColors.buttonColor,
+            ))
+          : BlocProvider(
+              create: (context) => MessageBloc()..add(LoadMessagesEvent()),
+              child: BlocBuilder<MessageBloc, MessageState>(
+                builder: (context, state) {
+                  if (state is LoadingMessageState) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (state is FailureMessageState) {
+                    return Center(child: Text('Error: ${state.error}'));
+                  } else if (state is SuccessMessageState) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: ListView.builder(
+                              reverse: true,
+                              itemCount: state.items.length,
+                              itemBuilder: (context, index) {
+                                final message = state.items[index];
+                                return MessageTileWidget(
+                                  username: message.username,
+                                  message: message.messages,
+                                );
+                              },
+                            ),
+                          ),
+                          MessageInputField(
+                            formKey: _formKey,
+                            controller: _messageController,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Write something, please';
+                              }
+                              return null;
+                            },
+                            onPressed: () async {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                try {
+                                  await FirebaseFirestore.instance
+                                      .collection('chat')
+                                      .add({
+                                    'message': _messageController.text,
+                                    'username': userData?['teamName']
+                                  });
+                                  _messageController.clear();
 
-                            context
-                                .read<MessageBloc>()
-                                .add(LoadMessagesEvent());
-                          } catch (e) {
-                            print('Error adding document: $e');
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Failed to add message')),
-                            );
-                          }
-                        }
-                      },
-                    ),
-                    SizedBox(height: 20),
-                  ],
-                ),
-              );
-            }
-            return Container();
-          },
-        ),
-      ),
+                                  context
+                                      .read<MessageBloc>()
+                                      .add(LoadMessagesEvent());
+                                } catch (e) {
+                                  print('Error adding document: $e');
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text('Failed to add message')),
+                                  );
+                                }
+                              }
+                            },
+                          ),
+                          SizedBox(height: 20),
+                        ],
+                      ),
+                    );
+                  }
+                  return Container();
+                },
+              ),
+            ),
     );
   }
 }
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot snapshot =
+          await _firestore.collection('users').doc(user.uid).get();
+      setState(() {
+        userData = snapshot.data() as Map<String, dynamic>?;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("Profile Page"));
+    return Scaffold(
+      appBar: CustomAppBar(
+          title: 'Profile',
+          backgroundColor: AppColors.mainColor,
+          popAble: false),
+      body: userData == null
+          ? Center(
+              child: CircularProgressIndicator(
+              color: AppColors.buttonColor,
+            ))
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Team Name: ${userData?['teamName'] ?? ''}',
+                    style: TextStyles.headerText,
+                  ),
+                  Text(
+                    'Email: ${userData?['email'] ?? ''}',
+                    style: TextStyles.headerText,
+                  ),
+                  Text(
+                    'Members: ${userData?['memberNames']?.join(', ') ?? ''}',
+                    style: TextStyles.headerText,
+                  ),
+                  CustomButton(
+                      onTap: () async {
+                        await FirebaseAuth.instance.signOut();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InitializationPage()));
+                      },
+                      btnText: 'Sign Out')
+                ],
+              ),
+            ),
+    );
   }
 }

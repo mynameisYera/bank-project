@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
@@ -6,6 +8,8 @@ import 'package:gradus/src/core/widgets/custom_appbar.dart';
 import 'package:gradus/src/core/widgets/custom_button.dart';
 import 'package:gradus/src/core/widgets/custom_button_grey.dart';
 import 'package:gradus/src/core/widgets/custom_text_field.dart';
+import 'package:gradus/src/features/main/presentation/pages/main_page.dart';
+import 'package:gradus/src/features/unauth/domain/firebase_auth_services.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -15,6 +19,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
   // conrollers
   final TextEditingController _teamController = TextEditingController();
   final TextEditingController _firstPersonController = TextEditingController();
@@ -158,12 +163,32 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(height: 10),
 
                 // button
-                CustomButton(onTap: () {}, btnText: "Agree to continue")
+                CustomButton(onTap: _signUp, btnText: "Agree to continue")
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  void _signUp() async {
+    String password = _passwordController.text;
+    String emailAddress = _emailController.text;
+    String teamName = _teamController.text;
+    List<String> memberNames = [
+      _firstPersonController.text,
+      _secondPersonController.text,
+      _thirdPersonController.text
+    ];
+
+    User? user = await _auth.signUpWithEmailAndPassword(
+        emailAddress, password, teamName, memberNames);
+
+    if (user != null) {
+      print('signed in');
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => NavPage()));
+    }
   }
 }
