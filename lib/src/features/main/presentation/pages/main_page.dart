@@ -226,58 +226,76 @@ class _ChatPageState extends State<ChatPage> {
                   } else if (state is FailureMessageState) {
                     return Center(child: Text('Error: ${state.error}'));
                   } else if (state is SuccessMessageState) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                      child: Column(
-                        children: [
-                          Expanded(
-                            child: ListView.builder(
-                              reverse: true,
-                              itemCount: state.items.length,
-                              itemBuilder: (context, index) {
-                                final message = state.items[index];
-                                return MessageTileWidget(
-                                  username: message.username,
-                                  message: message.messages,
-                                );
+                    return Container(
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: AssetImage('assets/images/chat_bg.png'),
+                              fit: BoxFit.cover)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: ListView.builder(
+                                reverse: true,
+                                itemCount: state.items.length,
+                                itemBuilder: (context, index) {
+                                  final message = state.items[index];
+                                  if (state.items[index].username ==
+                                      userData?['teamName']) {
+                                    return MessageTileWidget(
+                                      username: message.username,
+                                      message: message.messages,
+                                      isMe: true,
+                                    );
+                                  } else {
+                                    return MessageTileWidget(
+                                      isMe: false,
+                                      username: message.username,
+                                      message: message.messages,
+                                    );
+                                  }
+                                },
+                              ),
+                            ),
+                            MessageInputField(
+                              formKey: _formKey,
+                              controller: _messageController,
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Write something, please';
+                                }
+                                return null;
+                              },
+                              onPressed: () async {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  try {
+                                    await FirebaseFirestore.instance
+                                        .collection('chat')
+                                        .add({
+                                      'message': _messageController.text,
+                                      'username': userData?['teamName']
+                                    });
+                                    _messageController.clear();
+
+                                    context
+                                        .read<MessageBloc>()
+                                        .add(LoadMessagesEvent());
+                                  } catch (e) {
+                                    print('Error adding document: $e');
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                          content:
+                                              Text('Failed to add message')),
+                                    );
+                                  }
+                                }
                               },
                             ),
-                          ),
-                          MessageInputField(
-                            formKey: _formKey,
-                            controller: _messageController,
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Write something, please';
-                              }
-                              return null;
-                            },
-                            onPressed: () async {
-                              if (_formKey.currentState?.validate() ?? false) {
-                                try {
-                                  await FirebaseFirestore.instance
-                                      .collection('chat')
-                                      .add({
-                                    'message': _messageController.text,
-                                    'username': userData?['teamName']
-                                  });
-                                  _messageController.clear();
-
-                                  context
-                                      .read<MessageBloc>()
-                                      .add(LoadMessagesEvent());
-                                } catch (e) {
-                                  print('Error adding document: $e');
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text('Failed to add message')),
-                                  );
-                                }
-                              }
-                            },
-                          ),
-                          SizedBox(height: 20),
-                        ],
+                            SizedBox(height: 20),
+                          ],
+                        ),
                       ),
                     );
                   }
@@ -344,6 +362,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   Text(
                     'Members: ${userData?['memberNames']?.join(', ') ?? ''}',
+                    style: TextStyles.headerText,
+                  ),
+                  Text(
+                    'Score: ${userData?['score']}',
                     style: TextStyles.headerText,
                   ),
                   CustomButton(
