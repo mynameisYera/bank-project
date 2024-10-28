@@ -31,6 +31,20 @@ class FirebaseAuthServices {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  Future<User?> signInWithEmail(String email, String password) async {
+    try {
+      UserCredential credential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      print("Login successful");
+      return credential.user;
+    } on FirebaseAuthException catch (e) {
+      print("Error: ${e.message}");
+      return null;
+    }
+  }
+
   Future<User?> signUpWithEmailAndPassword(String emailAddress, String password,
       String teamName, List<String> memberNames) async {
     try {

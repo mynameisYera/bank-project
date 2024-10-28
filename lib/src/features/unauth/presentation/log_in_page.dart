@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/widgets/custom_appbar.dart';
 import 'package:gradus/src/core/widgets/custom_button.dart';
 import 'package:gradus/src/core/widgets/custom_text_field.dart';
 import 'package:gradus/src/features/main/presentation/pages/main_page.dart';
+import 'package:gradus/src/features/unauth/domain/firebase_auth_services.dart';
 import 'package:gradus/src/features/unauth/presentation/sign_up_page.dart';
 
 import '../../../core/theme/text_theme.dart';
@@ -16,6 +18,8 @@ class LogInPage extends StatefulWidget {
 }
 
 class _LogInPageState extends State<LogInPage> {
+  final FirebaseAuthServices _auth = FirebaseAuthServices();
+
   final TextEditingController _teamController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -47,13 +51,13 @@ class _LogInPageState extends State<LogInPage> {
                 children: [
                   // name of the team
                   Text(
-                    'Name of the Team',
+                    'Your email address',
                     style: TextStyles.headerText,
                   ),
                   const SizedBox(height: 5),
                   CustomTextField(
                     controller: _teamController,
-                    hintText: 'F troishniki',
+                    hintText: 'Email',
                     obscure: false,
                   ),
                   const SizedBox(height: 10),
@@ -77,12 +81,7 @@ class _LogInPageState extends State<LogInPage> {
                   const SizedBox(height: 20),
 
                   // continue button
-                  CustomButton(
-                      onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => NavPage()));
-                      },
-                      btnText: 'Continue'),
+                  CustomButton(onTap: _signIn, btnText: 'Continue'),
                   const SizedBox(height: 20),
 
                   Row(
@@ -112,5 +111,20 @@ class _LogInPageState extends State<LogInPage> {
         ),
       ),
     );
+  }
+
+  void _signIn() async {
+    String password = _passwordController.text;
+    String email = _teamController.text;
+
+    User? user = await _auth.signInWithEmail(email, password);
+
+    if (user != null) {
+      print('signed in');
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => NavPage()));
+    } else {
+      print("Sign-in failed");
+    }
   }
 }

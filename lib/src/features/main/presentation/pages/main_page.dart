@@ -205,7 +205,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Chat Page',
+        title: 'Open Chat',
         backgroundColor: AppColors.mainColor,
         popAble: false,
       ),
@@ -219,7 +219,10 @@ class _ChatPageState extends State<ChatPage> {
               child: BlocBuilder<MessageBloc, MessageState>(
                 builder: (context, state) {
                   if (state is LoadingMessageState) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: AppColors.buttonColor,
+                    ));
                   } else if (state is FailureMessageState) {
                     return Center(child: Text('Error: ${state.error}'));
                   } else if (state is SuccessMessageState) {
