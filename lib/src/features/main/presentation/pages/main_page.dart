@@ -219,8 +219,6 @@ class LeaderboardsPage extends StatefulWidget {
 }
 
 class _LeaderboardsPageState extends State<LeaderboardsPage> {
-<<<<<<< HEAD
-=======
   final CollectionReference _firestore =
       FirebaseFirestore.instance.collection('users');
   List<Map<String, dynamic>> _leaderboardData = [];
@@ -250,7 +248,6 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
     super.initState();
   }
 
->>>>>>> a3d78cd549848880fdf039ace7298f8cf2e2689c
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -261,116 +258,6 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
         popAble: false,
       ),
       body: Center(
-<<<<<<< HEAD
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          child: Stack(
-            children: [
-              // podium
-              SizedBox(
-                height: 310,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          child: Image.asset("assets/images/Avatar.png"),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Alena Donin',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '1,230S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SvgPicture.asset("assets/images/Rank2.svg")
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 60,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Image.asset("assets/images/Avatar.png"),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Davis Curtis',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '2,5430S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SvgPicture.asset("assets/images/rank1.svg")
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 60,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Image.asset(
-                            "assets/images/Avatar.png",
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Graig Gouse',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '1,020S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                            child: SvgPicture.asset("assets/images/rank3.svg"))
-                      ],
-=======
         child: _leaderboardData.isEmpty
             ? const CircularProgressIndicator(
                 color: AppColors.buttonColor,
@@ -442,35 +329,10 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                               teamName: item['teamName'],
                             );
                           }),
->>>>>>> a3d78cd549848880fdf039ace7298f8cf2e2689c
                     ),
                   ],
                 ),
               ),
-<<<<<<< HEAD
-              Expanded(
-                  child: Container(
-                margin: const EdgeInsets.only(top: 300),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xff262626),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ListView.separated(
-                    itemCount: 10,
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 16);
-                    },
-                    itemBuilder: (context, index) {
-                      return CustomTile(place: index + 1);
-                    }),
-              )),
-            ],
-          ),
-        ),
-=======
->>>>>>> a3d78cd549848880fdf039ace7298f8cf2e2689c
       ),
     );
   }
@@ -545,7 +407,7 @@ class _ChatPageState extends State<ChatPage> {
                             children: [
                               Expanded(
                                 child: ListView.builder(
-                                  reverse: true,
+                                  reverse: false,
                                   itemCount: state.items.length,
                                   itemBuilder: (context, index) {
                                     final message = state.items[index];
@@ -566,6 +428,42 @@ class _ChatPageState extends State<ChatPage> {
                                   },
                                 ),
                               ),
+                              // MessageInputField(
+                              //   formKey: _formKey,
+                              //   controller: _messageController,
+                              //   validator: (value) {
+                              //     if (value == null || value.isEmpty) {
+                              //       return 'Write something, please';
+                              //     }
+                              //     return null;
+                              //   },
+                              //   onPressed: () async {
+                              //     if (_formKey.currentState?.validate() ??
+                              //         false) {
+                              //       try {
+                              //         await FirebaseFirestore.instance
+                              //             .collection('chat')
+                              //             .add({
+                              //           'message': _messageController.text,
+                              //           'username': userData?['teamName']
+                              //         });
+                              //         _messageController.clear();
+
+                              //         context
+                              //             .read<MessageBloc>()
+                              //             .add(LoadMessagesEvent());
+                              //       } catch (e) {
+                              //         print('Error adding document: $e');
+                              //         ScaffoldMessenger.of(context)
+                              //             .showSnackBar(
+                              //           const SnackBar(
+                              //               content:
+                              //                   Text('Failed to add message')),
+                              //         );
+                              //       }
+                              //     }
+                              //   },
+                              // ),
                               MessageInputField(
                                 formKey: _formKey,
                                 controller: _messageController,
@@ -583,7 +481,7 @@ class _ChatPageState extends State<ChatPage> {
                                           .collection('chat')
                                           .add({
                                         'message': _messageController.text,
-                                        'username': userData?['teamName']
+                                        'username': userData?['teamName'],
                                       });
                                       _messageController.clear();
 
@@ -594,7 +492,7 @@ class _ChatPageState extends State<ChatPage> {
                                       print('Error adding document: $e');
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                             content:
                                                 Text('Failed to add message')),
                                       );
@@ -602,50 +500,9 @@ class _ChatPageState extends State<ChatPage> {
                                   }
                                 },
                               ),
-<<<<<<< HEAD
-                            ),
-                            MessageInputField(
-                              formKey: _formKey,
-                              controller: _messageController,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Write something, please';
-                                }
-                                return null;
-                              },
-                              onPressed: () async {
-                                if (_formKey.currentState?.validate() ??
-                                    false) {
-                                  try {
-                                    await FirebaseFirestore.instance
-                                        .collection('chat')
-                                        .add({
-                                      'message': _messageController.text,
-                                      'username': userData?['teamName'],
-                                    });
-                                    _messageController.clear();
-
-                                    context
-                                        .read<MessageBloc>()
-                                        .add(LoadMessagesEvent());
-                                  } catch (e) {
-                                    print('Error adding document: $e');
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content:
-                                              Text('Failed to add message')),
-                                    );
-                                  }
-                                }
-                              },
-                            ),
-                            SizedBox(height: 20),
-                          ],
-=======
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
                             ],
                           ),
->>>>>>> a3d78cd549848880fdf039ace7298f8cf2e2689c
                         ),
                       ),
                     );
@@ -789,9 +646,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           subtitle: "Further secure your account for safety",
                         ),
                         ProfileTile(
-                          onTap: () {
-                            
-                          },
+                          onTap: () {},
                           icon: Icons.logout_outlined,
                           isLogout: true,
                           title: "Log out",
