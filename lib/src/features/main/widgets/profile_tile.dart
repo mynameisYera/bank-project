@@ -9,16 +9,18 @@ class ProfileTile extends StatelessWidget {
     required this.icon,
     required this.title,
     required this.subtitle,
+    this.isLogout,
   });
   final Function()? onTap;
   final IconData icon;
   final String title;
   final String subtitle;
+  final bool? isLogout;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: GestureDetector(
         onTap: onTap,
         child: Row(
@@ -36,7 +38,7 @@ class ProfileTile extends StatelessWidget {
                   ),
                   child: Icon(
                     icon,
-                    color: Colors.white,
+                    color: isLogout == true ? Colors.red : Colors.white,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -45,12 +47,19 @@ class ProfileTile extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: TextStyles.miniText,
+                      style: isLogout == true
+                          ? const TextStyle(
+                              fontSize: 14,
+                              color: Colors.red,
+                              fontWeight: FontWeight.normal)
+                          : TextStyles.miniText,
                     ),
-                    subtitle.isNotEmpty ? Text(
-                      subtitle,
-                      style: TextStyles.tileText,
-                    ) : const SizedBox(),
+                    subtitle.isNotEmpty
+                        ? Text(
+                            subtitle,
+                            style: TextStyles.tileText,
+                          )
+                        : const SizedBox(),
                   ],
                 ),
               ],

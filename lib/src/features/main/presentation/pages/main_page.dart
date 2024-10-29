@@ -492,6 +492,53 @@ class _ProfilePageState extends State<ProfilePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xff652DDC),
+                              border:
+                                  Border.all(color: Colors.white, width: 2)),
+                          child: const Text(
+                            '#1',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userData?['teamName'],
+                              style: TextStyles.headerText,
+                            ),
+                            Text(
+                              userData?['email'],
+                              style: TextStyles.simpleText,
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // settings list
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 15),
                     decoration: BoxDecoration(
                       color: AppColors.grey,
                       borderRadius: BorderRadius.circular(5),
@@ -499,56 +546,62 @@ class _ProfilePageState extends State<ProfilePage> {
                     child: Column(
                       children: [
                         // one tile
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              // icon
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 40,
-                                    decoration: const BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Color(0xff535353),
-                                    ),
-                                    child: const Icon(
-                                      Icons.person_outline_rounded,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'My Account',
-                                        style: TextStyles.miniText,
-                                      ),
-                                      Text(
-                                        'Make changes to your account',
-                                        style: TextStyles.tileText,
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                color: Colors.white,
-                              )
-                            ],
-                          ),
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.person,
+                          title: "My Account",
+                          subtitle: "Make changes to your account",
                         ),
                         ProfileTile(
-                            onTap: () {},
-                            icon: Icons.person,
-                            title: "Saved Bebeficiary",
-                            subtitle: "Make changes to your account"),
+                          onTap: () {},
+                          icon: Icons.person,
+                          title: "Saved Beneficiary",
+                          subtitle: "Make changes to your account",
+                        ),
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.security_rounded,
+                          title: "Two-Factor Authentication",
+                          subtitle: "Further secure your account for safety",
+                        ),
+                        ProfileTile(
+                          onTap: () {
+                            
+                          },
+                          icon: Icons.logout_outlined,
+                          isLogout: true,
+                          title: "Log out",
+                          subtitle: "Further secure your account for safety",
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  // more and more
+                  Text("More", style: TextStyles.headerText),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Column(
+                      children: [
+                        // one tile
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.notifications_outlined,
+                          title: "Help & Support",
+                          subtitle: "",
+                        ),
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.favorite_outline_rounded,
+                          title: "About App",
+                          subtitle: "",
+                        ),
                       ],
                     ),
                   ),
