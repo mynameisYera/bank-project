@@ -15,7 +15,6 @@ class CurrentBookWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width / 1.5,
       height: 77,
       decoration: BoxDecoration(
         color: AppColors.blueColor,

@@ -10,7 +10,9 @@ import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/theme/text_theme.dart';
 import 'package:gradus/src/core/widgets/custom_appbar.dart';
 import 'package:gradus/src/core/widgets/custom_button.dart';
+import 'package:gradus/src/features/main/presentation/bloc/current_bloc/current_bloc.dart';
 import 'package:gradus/src/features/main/presentation/bloc/message_bloc/message_bloc.dart';
+import 'package:gradus/src/features/main/presentation/bloc/next_book_bloc/next_book_bloc.dart';
 import 'package:gradus/src/features/main/widgets/current_book_widget.dart';
 import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
 import 'package:gradus/src/features/main/widgets/message_send_field.dart';
@@ -78,12 +80,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> voteTile = [
-      {'bookName': 'Harry Potter II', 'page': 325, 'vote': 23},
-      {'bookName': 'Harry Potter II', 'page': 325, 'vote': 23},
-      {'bookName': 'Harry Potter II', 'page': 325, 'vote': 23},
-    ];
-
     final Map<String, dynamic> currentBook = {
       'bookName': 'Shoko Alem',
       'page': 343,
@@ -108,10 +104,36 @@ class HomePage extends StatelessWidget {
               SizedBox(
                 height: 20,
               ),
-              CurrentBookWidget(
-                bookName: currentBook['bookName'],
-                page: currentBook['page'],
-                image: currentBook['image'],
+              BlocProvider(
+                create: (context) => CurrentBloc()..add(LoadCurrentEvent()),
+                child: BlocBuilder<CurrentBloc, CurrentState>(
+                  builder: (context, state) {
+                    if (state is LoadingCurrentState) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.buttonColor,
+                        ),
+                      );
+                    } else if (state is SuccessCurrentState) {
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width / 1.5,
+                        height: 77,
+                        child: ListView.builder(
+                          itemCount: state.items.length,
+                          itemBuilder: (context, index) {
+                            return CurrentBookWidget(
+                              bookName: state.items[index].bookName,
+                              page: state.items[index].page,
+                              image: state.items[index].image,
+                            );
+                          },
+                        ),
+                      );
+                    } else {
+                      return CustomButton(onTap: () {}, btnText: 'Try again');
+                    }
+                  },
+                ),
               ),
               SizedBox(
                 height: 20,
@@ -121,16 +143,39 @@ class HomePage extends StatelessWidget {
                 style: TextStyles.headerText,
               ),
               SizedBox(
-                height: (77 * 3) + (20 * 3),
-                child: ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: voteTile.length,
-                    itemBuilder: (context, index) {
-                      return VoteTileWidget(
-                          bookName: voteTile[index]['bookName'],
-                          page: voteTile[index]['page'],
-                          vote: voteTile[index]['vote']);
-                    }),
+                height: 20,
+              ),
+              BlocProvider(
+                create: (context) => NextBookBloc()..add(LoadNextBookEvent()),
+                child: BlocBuilder<NextBookBloc, NextBookState>(
+                  builder: (context, state) {
+                    if (state is LoadingNextBookState) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.buttonColor,
+                        ),
+                      );
+                    }
+                    if (state is SuccessNextBookState) {
+                      return SizedBox(
+                        height: (77 * state.items.length) +
+                            (20 * state.items.length.toDouble()),
+                        child: ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            itemCount: state.items.length,
+                            itemBuilder: (context, index) {
+                              return VoteTileWidget(
+                                  bookName: state.items[index].name,
+                                  page: state.items[index].page,
+                                  vote: state.items[index].vote);
+                            }),
+                      );
+                    } else {
+                      return CustomButton(
+                          onTap: () {}, btnText: 'Error accused');
+                    }
+                  },
+                ),
               ),
               SizedBox(
                 height: 20,
