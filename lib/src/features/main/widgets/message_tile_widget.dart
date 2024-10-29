@@ -31,15 +31,17 @@ class MessageTileWidget extends StatelessWidget {
           ),
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+                const EdgeInsets.symmetric(horizontal: 25.0, vertical: 15.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  username.toUpperCase(),
-                  style: TextStyles.headerText.copyWith(
-                      color: isMe ? AppColors.notBlack : AppColors.buttonColor),
-                ),
+                isMe
+                    ? Container()
+                    : Text(
+                        username,
+                        style: TextStyles.headerText
+                            .copyWith(color: AppColors.buttonColor),
+                      ),
                 Text(
                   message,
                   style: TextStyles.simpleText,
@@ -49,7 +51,7 @@ class MessageTileWidget extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 10,
+          height: 30,
         )
       ],
     );

@@ -75,12 +75,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> voteTile = [
-      {'bookName': 'Harry Potter II', 'page': 325, 'vote': 23},
-      {'bookName': 'Harry Potter II', 'page': 325, 'vote': 23},
-      {'bookName': 'Harry Potter II', 'page': 325, 'vote': 23},
-    ];
-
     final Map<String, dynamic> currentBook = {
       'bookName': 'Shoko Alem',
       'page': 343,
@@ -473,7 +467,7 @@ class _ChatPageState extends State<ChatPage> {
                                         .collection('chat')
                                         .add({
                                       'message': _messageController.text,
-                                      'username': userData?['teamName']
+                                      'username': userData?['teamName'],
                                     });
                                     _messageController.clear();
 
