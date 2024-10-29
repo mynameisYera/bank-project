@@ -11,4 +11,6 @@ class AppColors {
   static const Color blueColor = Color(0xff3090C9);
   //not black
   static const Color notBlack = Color(0xff313131);
+  //not black
+  static const Color grey = Color(0xff4A4A4A);
 }

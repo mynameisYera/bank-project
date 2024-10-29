@@ -20,4 +20,8 @@ class TextStyles {
       fontWeight: FontWeight.normal,
       decoration: TextDecoration.underline,
       decorationColor: Colors.white);
+  // profile tile text
+  static TextStyle tileText = const TextStyle(
+    fontSize: 11, color: Color(0xffABABAB), fontWeight: FontWeight.normal,
+  );
 }

@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:ui';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,6 +16,7 @@ import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
 import 'package:gradus/src/features/main/widgets/message_send_field.dart';
 import 'package:gradus/src/features/main/widgets/message_tile_widget.dart';
 import 'package:gradus/src/features/main/widgets/podium_widget.dart';
+import 'package:gradus/src/features/main/widgets/profile_tile.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
@@ -177,17 +179,22 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
   List<Map<String, dynamic>> _leaderboardData = [];
 
   Future<void> _loadLeaderBoardsData() async {
-    QuerySnapshot snapshot = await _firestore.get();
-    final allData =
-        snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
-    log(allData.toString());
+    try {
+      QuerySnapshot snapshot = await _firestore.get();
+      final allData = snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+      log(allData.toString());
 
-    // data sorting
-    allData.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+      // data sorting
+      allData.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
 
-    setState(() {
-      _leaderboardData = allData;
-    });
+      setState(() {
+        _leaderboardData = allData;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override
@@ -326,7 +333,7 @@ class _ChatPageState extends State<ChatPage> {
         popAble: false,
       ),
       body: userData == null
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
               color: AppColors.buttonColor,
             ))
@@ -335,7 +342,7 @@ class _ChatPageState extends State<ChatPage> {
               child: BlocBuilder<MessageBloc, MessageState>(
                 builder: (context, state) {
                   if (state is LoadingMessageState) {
-                    return Center(
+                    return const Center(
                         child: CircularProgressIndicator(
                       color: AppColors.buttonColor,
                     ));
@@ -343,74 +350,78 @@ class _ChatPageState extends State<ChatPage> {
                     return Center(child: Text('Error: ${state.error}'));
                   } else if (state is SuccessMessageState) {
                     return Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                           image: DecorationImage(
                               image: AssetImage('assets/images/chat_bg.png'),
                               fit: BoxFit.cover)),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: ListView.builder(
-                                reverse: true,
-                                itemCount: state.items.length,
-                                itemBuilder: (context, index) {
-                                  final message = state.items[index];
-                                  if (state.items[index].username ==
-                                      userData?['teamName']) {
-                                    return MessageTileWidget(
-                                      username: message.username,
-                                      message: message.messages,
-                                      isMe: true,
-                                    );
-                                  } else {
-                                    return MessageTileWidget(
-                                      isMe: false,
-                                      username: message.username,
-                                      message: message.messages,
-                                    );
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                  reverse: true,
+                                  itemCount: state.items.length,
+                                  itemBuilder: (context, index) {
+                                    final message = state.items[index];
+                                    if (state.items[index].username ==
+                                        userData?['teamName']) {
+                                      return MessageTileWidget(
+                                        username: message.username,
+                                        message: message.messages,
+                                        isMe: true,
+                                      );
+                                    } else {
+                                      return MessageTileWidget(
+                                        isMe: false,
+                                        username: message.username,
+                                        message: message.messages,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              MessageInputField(
+                                formKey: _formKey,
+                                controller: _messageController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Write something, please';
+                                  }
+                                  return null;
+                                },
+                                onPressed: () async {
+                                  if (_formKey.currentState?.validate() ??
+                                      false) {
+                                    try {
+                                      await FirebaseFirestore.instance
+                                          .collection('chat')
+                                          .add({
+                                        'message': _messageController.text,
+                                        'username': userData?['teamName']
+                                      });
+                                      _messageController.clear();
+
+                                      context
+                                          .read<MessageBloc>()
+                                          .add(LoadMessagesEvent());
+                                    } catch (e) {
+                                      print('Error adding document: $e');
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Failed to add message')),
+                                      );
+                                    }
                                   }
                                 },
                               ),
-                            ),
-                            MessageInputField(
-                              formKey: _formKey,
-                              controller: _messageController,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Write something, please';
-                                }
-                                return null;
-                              },
-                              onPressed: () async {
-                                if (_formKey.currentState?.validate() ??
-                                    false) {
-                                  try {
-                                    await FirebaseFirestore.instance
-                                        .collection('chat')
-                                        .add({
-                                      'message': _messageController.text,
-                                      'username': userData?['teamName']
-                                    });
-                                    _messageController.clear();
-
-                                    context
-                                        .read<MessageBloc>()
-                                        .add(LoadMessagesEvent());
-                                  } catch (e) {
-                                    print('Error adding document: $e');
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content:
-                                              Text('Failed to add message')),
-                                    );
-                                  }
-                                }
-                              },
-                            ),
-                            SizedBox(height: 20),
-                          ],
+                              const SizedBox(height: 20),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -451,15 +462,27 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // how to get user data: userData?['teamName']
+  // CustomButton(
+  //                   onTap: () async {
+  //                     await FirebaseAuth.instance.signOut();
+  //                     Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                             builder: (context) => InitializationPage()));
+  //                   },
+  //                   btnText: 'Sign Out',
+  //                 )
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
           title: 'Profile',
           backgroundColor: AppColors.mainColor,
           popAble: false),
       body: userData == null
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
               color: AppColors.buttonColor,
             ))
@@ -468,31 +491,67 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Team Name: ${userData?['teamName'] ?? ''}',
-                    style: TextStyles.headerText,
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Column(
+                      children: [
+                        // one tile
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // icon
+                              Row(
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xff535353),
+                                    ),
+                                    child: const Icon(
+                                      Icons.person_outline_rounded,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'My Account',
+                                        style: TextStyles.miniText,
+                                      ),
+                                      Text(
+                                        'Make changes to your account',
+                                        style: TextStyles.tileText,
+                                      )
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const Icon(
+                                Icons.arrow_forward_ios_rounded,
+                                color: Colors.white,
+                              )
+                            ],
+                          ),
+                        ),
+                        ProfileTile(
+                            onTap: () {},
+                            icon: Icons.person,
+                            title: "Saved Bebeficiary",
+                            subtitle: "Make changes to your account"),
+                      ],
+                    ),
                   ),
-                  Text(
-                    'Email: ${userData?['email'] ?? ''}',
-                    style: TextStyles.headerText,
-                  ),
-                  Text(
-                    'Members: ${userData?['memberNames']?.join(', ') ?? ''}',
-                    style: TextStyles.headerText,
-                  ),
-                  Text(
-                    'Score: ${userData?['score']}',
-                    style: TextStyles.headerText,
-                  ),
-                  CustomButton(
-                      onTap: () async {
-                        await FirebaseAuth.instance.signOut();
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => InitializationPage()));
-                      },
-                      btnText: 'Sign Out')
                 ],
               ),
             ),
