@@ -24,10 +24,10 @@ class MessageTileWidget extends StatelessWidget {
           decoration: BoxDecoration(
             color: isMe ? AppColors.buttonColor : AppColors.notBlack,
             borderRadius: BorderRadius.only(
-                bottomRight: Radius.circular(20),
-                topLeft: Radius.circular(20),
-                topRight: isMe ? Radius.circular(0) : Radius.circular(20),
-                bottomLeft: isMe ? Radius.circular(20) : Radius.circular(0)),
+                bottomRight: Radius.circular(30),
+                topLeft: Radius.circular(30),
+                topRight: isMe ? Radius.circular(0) : Radius.circular(30),
+                bottomLeft: isMe ? Radius.circular(30) : Radius.circular(0)),
           ),
           child: Padding(
             padding:
@@ -51,7 +51,7 @@ class MessageTileWidget extends StatelessWidget {
           ),
         ),
         SizedBox(
-          height: 30,
+          height: 20,
         )
       ],
     );

@@ -4,15 +4,18 @@ import 'package:equatable/equatable.dart';
 class MessageEntity extends Equatable {
   final String messages;
   final String username;
+  final int timestamp;
 
   const MessageEntity({
     required this.username,
+    required this.timestamp,
     required this.messages,
   });
 
   factory MessageEntity.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return MessageEntity(
+      timestamp: data['timestamp'] ?? 999999999999999,
       messages: data['message'] ?? '',
       username: data['username'] ?? '',
     );
@@ -25,5 +28,5 @@ class MessageEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [messages, username];
+  List<Object?> get props => [messages, username, timestamp];
 }
