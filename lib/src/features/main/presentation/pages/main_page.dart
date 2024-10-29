@@ -1,3 +1,6 @@
+import 'dart:developer';
+import 'dart:ui';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +17,8 @@ import 'package:gradus/src/features/main/widgets/current_book_widget.dart';
 import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
 import 'package:gradus/src/features/main/widgets/message_send_field.dart';
 import 'package:gradus/src/features/main/widgets/message_tile_widget.dart';
+import 'package:gradus/src/features/main/widgets/podium_widget.dart';
+import 'package:gradus/src/features/main/widgets/profile_tile.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
@@ -214,6 +219,35 @@ class LeaderboardsPage extends StatefulWidget {
 }
 
 class _LeaderboardsPageState extends State<LeaderboardsPage> {
+  final CollectionReference _firestore =
+      FirebaseFirestore.instance.collection('users');
+  List<Map<String, dynamic>> _leaderboardData = [];
+
+  Future<void> _loadLeaderBoardsData() async {
+    try {
+      QuerySnapshot snapshot = await _firestore.get();
+      final allData = snapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+      log(allData.toString());
+
+      // data sorting
+      allData.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+      setState(() {
+        _leaderboardData = allData;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  @override
+  void initState() {
+    _loadLeaderBoardsData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -224,139 +258,81 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
         popAble: false,
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          child: Stack(
-            children: [
-              // podium
-              SizedBox(
-                height: 310,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+        child: _leaderboardData.isEmpty
+            ? const CircularProgressIndicator(
+                color: AppColors.buttonColor,
+              )
+            : Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: Stack(
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          child: Image.asset("assets/images/Avatar.png"),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Alena Donin',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '1,230S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SvgPicture.asset("assets/images/Rank2.svg")
-                      ],
+                    // podium
+                    SizedBox(
+                      height: 310,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          // rank2
+                          if (_leaderboardData.length > 1)
+                            PodiumWidget(
+                              rankPicture: 'Rank2.svg',
+                              score: _leaderboardData[1]['score'],
+                              teamName: _leaderboardData[1]['teamName'],
+                              imageLogo: 'Avatar.png',
+                            ),
+
+                          // rank1
+                          if (_leaderboardData.isNotEmpty)
+                            PodiumWidget(
+                              rankPicture: 'rank1.svg',
+                              score: _leaderboardData[0]['score'],
+                              teamName: _leaderboardData[0]['teamName'],
+                              imageLogo: 'Avatar.png',
+                            ),
+
+                          // rank3
+                          if (_leaderboardData.length > 2)
+                            PodiumWidget(
+                              rankPicture: 'rank3.svg',
+                              score: _leaderboardData[2]['score'],
+                              teamName: _leaderboardData[2]['teamName'],
+                              imageLogo: 'Avatar.png',
+                            ),
+                        ],
+                      ),
                     ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 60,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Image.asset("assets/images/Avatar.png"),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Davis Curtis',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '2,5430S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SvgPicture.asset("assets/images/rank1.svg")
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 60,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Image.asset(
-                            "assets/images/Avatar.png",
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Graig Gouse',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '1,020S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(
-                            child: SvgPicture.asset("assets/images/rank3.svg"))
-                      ],
+
+                    // list of the items starting from 4 place
+                    Container(
+                      margin: const EdgeInsets.only(top: 300),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff262626),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: ListView.separated(
+                          itemCount: _leaderboardData.length - 3,
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(height: 16);
+                          },
+                          itemBuilder: (context, index) {
+                            final item = _leaderboardData[index + 3];
+
+                            return CustomTile(
+                              place: index + 4,
+                              score: item['score'],
+                              teamName: item['teamName'],
+                            );
+                          }),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                  child: Container(
-                margin: const EdgeInsets.only(top: 300),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xff262626),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ListView.separated(
-                    itemCount: 10,
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 16);
-                    },
-                    itemBuilder: (context, index) {
-                      return CustomTile(place: index + 1);
-                    }),
-              )),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -402,7 +378,7 @@ class _ChatPageState extends State<ChatPage> {
         popAble: false,
       ),
       body: userData == null
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
               color: AppColors.buttonColor,
             ))
@@ -411,7 +387,7 @@ class _ChatPageState extends State<ChatPage> {
               child: BlocBuilder<MessageBloc, MessageState>(
                 builder: (context, state) {
                   if (state is LoadingMessageState) {
-                    return Center(
+                    return const Center(
                         child: CircularProgressIndicator(
                       color: AppColors.buttonColor,
                     ));
@@ -419,74 +395,78 @@ class _ChatPageState extends State<ChatPage> {
                     return Center(child: Text('Error: ${state.error}'));
                   } else if (state is SuccessMessageState) {
                     return Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                           image: DecorationImage(
                               image: AssetImage('assets/images/chat_bg.png'),
                               fit: BoxFit.cover)),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                        child: Column(
-                          children: [
-                            Expanded(
-                              child: ListView.builder(
-                                reverse: true,
-                                itemCount: state.items.length,
-                                itemBuilder: (context, index) {
-                                  final message = state.items[index];
-                                  if (state.items[index].username ==
-                                      userData?['teamName']) {
-                                    return MessageTileWidget(
-                                      username: message.username,
-                                      message: message.messages,
-                                      isMe: true,
-                                    );
-                                  } else {
-                                    return MessageTileWidget(
-                                      isMe: false,
-                                      username: message.username,
-                                      message: message.messages,
-                                    );
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                          child: Column(
+                            children: [
+                              Expanded(
+                                child: ListView.builder(
+                                  reverse: true,
+                                  itemCount: state.items.length,
+                                  itemBuilder: (context, index) {
+                                    final message = state.items[index];
+                                    if (state.items[index].username ==
+                                        userData?['teamName']) {
+                                      return MessageTileWidget(
+                                        username: message.username,
+                                        message: message.messages,
+                                        isMe: true,
+                                      );
+                                    } else {
+                                      return MessageTileWidget(
+                                        isMe: false,
+                                        username: message.username,
+                                        message: message.messages,
+                                      );
+                                    }
+                                  },
+                                ),
+                              ),
+                              MessageInputField(
+                                formKey: _formKey,
+                                controller: _messageController,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Write something, please';
+                                  }
+                                  return null;
+                                },
+                                onPressed: () async {
+                                  if (_formKey.currentState?.validate() ??
+                                      false) {
+                                    try {
+                                      await FirebaseFirestore.instance
+                                          .collection('chat')
+                                          .add({
+                                        'message': _messageController.text,
+                                        'username': userData?['teamName']
+                                      });
+                                      _messageController.clear();
+
+                                      context
+                                          .read<MessageBloc>()
+                                          .add(LoadMessagesEvent());
+                                    } catch (e) {
+                                      print('Error adding document: $e');
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text('Failed to add message')),
+                                      );
+                                    }
                                   }
                                 },
                               ),
-                            ),
-                            MessageInputField(
-                              formKey: _formKey,
-                              controller: _messageController,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Write something, please';
-                                }
-                                return null;
-                              },
-                              onPressed: () async {
-                                if (_formKey.currentState?.validate() ??
-                                    false) {
-                                  try {
-                                    await FirebaseFirestore.instance
-                                        .collection('chat')
-                                        .add({
-                                      'message': _messageController.text,
-                                      'username': userData?['teamName'],
-                                    });
-                                    _messageController.clear();
-
-                                    context
-                                        .read<MessageBloc>()
-                                        .add(LoadMessagesEvent());
-                                  } catch (e) {
-                                    print('Error adding document: $e');
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content:
-                                              Text('Failed to add message')),
-                                    );
-                                  }
-                                }
-                              },
-                            ),
-                            SizedBox(height: 20),
-                          ],
+                              const SizedBox(height: 20),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -527,15 +507,27 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  // how to get user data: userData?['teamName']
+  // CustomButton(
+  //                   onTap: () async {
+  //                     await FirebaseAuth.instance.signOut();
+  //                     Navigator.push(
+  //                         context,
+  //                         MaterialPageRoute(
+  //                             builder: (context) => InitializationPage()));
+  //                   },
+  //                   btnText: 'Sign Out',
+  //                 )
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(
+      appBar: const CustomAppBar(
           title: 'Profile',
           backgroundColor: AppColors.mainColor,
           popAble: false),
       body: userData == null
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(
               color: AppColors.buttonColor,
             ))
@@ -544,31 +536,120 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Team Name: ${userData?['teamName'] ?? ''}',
-                    style: TextStyles.headerText,
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xff652DDC),
+                              border:
+                                  Border.all(color: Colors.white, width: 2)),
+                          child: const Text(
+                            '#1',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userData?['teamName'],
+                              style: TextStyles.headerText,
+                            ),
+                            Text(
+                              userData?['email'],
+                              style: TextStyles.simpleText,
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    'Email: ${userData?['email'] ?? ''}',
-                    style: TextStyles.headerText,
+                  const SizedBox(height: 20),
+                  // settings list
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Column(
+                      children: [
+                        // one tile
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.person,
+                          title: "My Account",
+                          subtitle: "Make changes to your account",
+                        ),
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.person,
+                          title: "Saved Beneficiary",
+                          subtitle: "Make changes to your account",
+                        ),
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.security_rounded,
+                          title: "Two-Factor Authentication",
+                          subtitle: "Further secure your account for safety",
+                        ),
+                        ProfileTile(
+                          onTap: () {
+                            
+                          },
+                          icon: Icons.logout_outlined,
+                          isLogout: true,
+                          title: "Log out",
+                          subtitle: "Further secure your account for safety",
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    'Members: ${userData?['memberNames']?.join(', ') ?? ''}',
-                    style: TextStyles.headerText,
+                  const SizedBox(height: 20),
+                  // more and more
+                  Text("More", style: TextStyles.headerText),
+                  const SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 15),
+                    decoration: BoxDecoration(
+                      color: AppColors.grey,
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Column(
+                      children: [
+                        // one tile
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.notifications_outlined,
+                          title: "Help & Support",
+                          subtitle: "",
+                        ),
+                        ProfileTile(
+                          onTap: () {},
+                          icon: Icons.favorite_outline_rounded,
+                          title: "About App",
+                          subtitle: "",
+                        ),
+                      ],
+                    ),
                   ),
-                  Text(
-                    'Score: ${userData?['score']}',
-                    style: TextStyles.headerText,
-                  ),
-                  CustomButton(
-                      onTap: () async {
-                        await FirebaseAuth.instance.signOut();
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => InitializationPage()));
-                      },
-                      btnText: 'Sign Out')
                 ],
               ),
             ),
