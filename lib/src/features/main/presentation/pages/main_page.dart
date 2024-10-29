@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gradus/main.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/theme/text_theme.dart';
@@ -15,6 +16,8 @@ import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
 
+import '../../widgets/leaderboard_tile.dart';
+
 class NavPage extends StatefulWidget {
   const NavPage({super.key});
 
@@ -27,7 +30,7 @@ class _NavPageState extends State<NavPage> {
 
   final List<Widget> _pages = [
     HomePage(),
-    LeaderboardPage(),
+    LeaderboardsPage(),
     ChatPage(),
     ProfilePage(),
   ];
@@ -158,17 +161,161 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class LeaderboardPage extends StatefulWidget {
+class LeaderboardsPage extends StatefulWidget {
+  const LeaderboardsPage({super.key});
+
   @override
-  State<LeaderboardPage> createState() => _LeaderboardPageState();
+  State<LeaderboardsPage> createState() => _LeaderboardsPageState();
 }
 
-class _LeaderboardPageState extends State<LeaderboardPage> {
+class _LeaderboardsPageState extends State<LeaderboardsPage> {
   @override
   Widget build(BuildContext context) {
-    return Center(child: Text("Leaderboard Page"));
+    return Scaffold(
+      backgroundColor: const Color(0xff161616),
+      appBar: const CustomAppBar(
+        title: 'LeaderBoards',
+        backgroundColor: AppColors.mainColor,
+        popAble: false,
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+          child: Stack(
+            children: [
+              // podium
+              SizedBox(
+                height: 310,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          child: Image.asset("assets/images/Avatar.png"),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Alena Donin',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(6)),
+                          child: const Text(
+                            '1,230S',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SvgPicture.asset("assets/images/Rank2.svg")
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          height: 60,
+                          width: 60,
+                          clipBehavior: Clip.hardEdge,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                          ),
+                          child: Image.asset("assets/images/Avatar.png"),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Davis Curtis',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(6)),
+                          child: const Text(
+                            '2,5430S',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SvgPicture.asset("assets/images/rank1.svg")
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
+                          height: 60,
+                          width: 60,
+                          clipBehavior: Clip.hardEdge,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            ),
+                          child: Image.asset(
+                            "assets/images/Avatar.png",
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        const Text(
+                          'Graig Gouse',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        const SizedBox(height: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(6)),
+                          child: const Text(
+                            '1,020S',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(child: SvgPicture.asset("assets/images/rank3.svg"))
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                  child: Container(
+                margin: const EdgeInsets.only(top: 300),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: const Color(0xff262626),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: ListView.separated(
+                    itemCount: 10,
+                    separatorBuilder: (context, index) {
+                      return const SizedBox(height: 16);
+                    },
+                    itemBuilder: (context, index) {
+                      return CustomTile(place: index + 1);
+                    }),
+              )),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
+
 
 class ChatPage extends StatefulWidget {
   @override
