@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -12,6 +14,7 @@ import 'package:gradus/src/features/main/widgets/current_book_widget.dart';
 import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
 import 'package:gradus/src/features/main/widgets/message_send_field.dart';
 import 'package:gradus/src/features/main/widgets/message_tile_widget.dart';
+import 'package:gradus/src/features/main/widgets/podium_widget.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
@@ -169,6 +172,30 @@ class LeaderboardsPage extends StatefulWidget {
 }
 
 class _LeaderboardsPageState extends State<LeaderboardsPage> {
+  final CollectionReference _firestore =
+      FirebaseFirestore.instance.collection('users');
+  List<Map<String, dynamic>> _leaderboardData = [];
+
+  Future<void> _loadLeaderBoardsData() async {
+    QuerySnapshot snapshot = await _firestore.get();
+    final allData =
+        snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    log(allData.toString());
+
+    // data sorting
+    allData.sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+    setState(() {
+      _leaderboardData = allData;
+    });
+  }
+
+  @override
+  void initState() {
+    _loadLeaderBoardsData();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -179,143 +206,85 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
         popAble: false,
       ),
       body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-          child: Stack(
-            children: [
-              // podium
-              SizedBox(
-                height: 310,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+        child: _leaderboardData.isEmpty
+            ? const CircularProgressIndicator(
+                color: AppColors.buttonColor,
+              )
+            : Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: Stack(
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        CircleAvatar(
-                          radius: 30,
-                          child: Image.asset("assets/images/Avatar.png"),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Alena Donin',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '1,230S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SvgPicture.asset("assets/images/Rank2.svg")
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 60,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                          ),
-                          child: Image.asset("assets/images/Avatar.png"),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Davis Curtis',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '2,5430S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SvgPicture.asset("assets/images/rank1.svg")
-                      ],
-                    ),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Container(
-                          height: 60,
-                          width: 60,
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
+                    // podium
+                    SizedBox(
+                      height: 310,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          // rank2
+                          if (_leaderboardData.length > 1)
+                            PodiumWidget(
+                              rankPicture: 'Rank2.svg',
+                              score: _leaderboardData[1]['score'],
+                              teamName: _leaderboardData[1]['teamName'],
+                              imageLogo: 'Avatar.png',
                             ),
-                          child: Image.asset(
-                            "assets/images/Avatar.png",
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'Graig Gouse',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        const SizedBox(height: 10),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                              color: Colors.orange,
-                              borderRadius: BorderRadius.circular(6)),
-                          child: const Text(
-                            '1,020S',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        SizedBox(child: SvgPicture.asset("assets/images/rank3.svg"))
-                      ],
+
+                          // rank1
+                          if (_leaderboardData.isNotEmpty)
+                            PodiumWidget(
+                              rankPicture: 'rank1.svg',
+                              score: _leaderboardData[0]['score'],
+                              teamName: _leaderboardData[0]['teamName'],
+                              imageLogo: 'Avatar.png',
+                            ),
+
+                          // rank3
+                          if (_leaderboardData.length > 2)
+                            PodiumWidget(
+                              rankPicture: 'rank3.svg',
+                              score: _leaderboardData[2]['score'],
+                              teamName: _leaderboardData[2]['teamName'],
+                              imageLogo: 'Avatar.png',
+                            ),
+                        ],
+                      ),
+                    ),
+
+                    // list of the items starting from 4 place
+                    Container(
+                      margin: const EdgeInsets.only(top: 300),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      decoration: BoxDecoration(
+                        color: const Color(0xff262626),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: ListView.separated(
+                          itemCount: _leaderboardData.length - 3,
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(height: 16);
+                          },
+                          itemBuilder: (context, index) {
+                            final item = _leaderboardData[index + 3];
+
+                            return CustomTile(
+                              place: index + 4,
+                              score: item['score'],
+                              teamName: item['teamName'],
+                            );
+                          }),
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                  child: Container(
-                margin: const EdgeInsets.only(top: 300),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                decoration: BoxDecoration(
-                  color: const Color(0xff262626),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: ListView.separated(
-                    itemCount: 10,
-                    separatorBuilder: (context, index) {
-                      return const SizedBox(height: 16);
-                    },
-                    itemBuilder: (context, index) {
-                      return CustomTile(place: index + 1);
-                    }),
-              )),
-            ],
-          ),
-        ),
       ),
     );
   }
 }
-
 
 class ChatPage extends StatefulWidget {
   @override

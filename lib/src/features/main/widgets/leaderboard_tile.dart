@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomTile extends StatelessWidget {
-  const CustomTile({super.key, required this.place});
+  const CustomTile({super.key, required this.place, required this.score, required this.teamName});
   final int place;
+  final int score;
+  final String teamName;
+
 
   @override
   Widget build(BuildContext context) {
@@ -32,18 +35,18 @@ class CustomTile extends StatelessWidget {
             child: Image.asset("assets/images/Avatar.png"),
           ),
           const SizedBox(width: 16),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Madelyn Dias',
+                teamName,
                 style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
-              Text(
-                '590 points',
-                style: TextStyle(color: Colors.white),
+               Text(
+                '$score points',
+                style: const TextStyle(color: Colors.white),
               )
             ],
           )
