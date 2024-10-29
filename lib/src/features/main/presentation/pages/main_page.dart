@@ -397,7 +397,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Open Chat',
+        title: 'Open Chat ',
         backgroundColor: AppColors.mainColor,
         popAble: false,
       ),
