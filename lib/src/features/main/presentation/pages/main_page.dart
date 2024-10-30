@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gradus/main.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/theme/text_theme.dart';
@@ -23,7 +22,6 @@ import 'package:gradus/src/features/main/widgets/podium_widget.dart';
 import 'package:gradus/src/features/main/widgets/profile_tile.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
 
 import '../../widgets/leaderboard_tile.dart';
 
@@ -135,7 +133,10 @@ class HomePage extends StatelessWidget {
                           );
                         } else {
                           return CustomButton(
-                              onTap: () {}, btnText: 'Try again');
+                              onTap: () {
+                                context.read<NewsBloc>().add(LoadNewsEvent());
+                              },
+                              btnText: 'Try again');
                         }
                       },
                     ),
@@ -178,7 +179,10 @@ class HomePage extends StatelessWidget {
                           );
                         } else {
                           return CustomButton(
-                              onTap: () {}, btnText: 'Error accused');
+                              onTap: () {
+                                context.read<NewsBloc>().add(LoadNewsEvent());
+                              },
+                              btnText: 'Error accused');
                         }
                       },
                     ),
@@ -651,7 +655,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           // one tile
                           ProfileTile(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileInfoPage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProfileInfoPage()));
                             },
                             icon: Icons.person,
                             title: "My Account",
@@ -803,8 +810,7 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                           _userProfileData?['teamName'] ?? 'NO DATA',
                           style: TextStyles.headerText,
                         ),
-                        Text(
-                            'Score: ${_userProfileData?['score']}' ?? 'NO DATA',
+                        Text('Score: ${_userProfileData?['score']}',
                             style: TextStyles.miniText),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
