@@ -12,6 +12,7 @@ import 'package:gradus/src/core/widgets/custom_appbar.dart';
 import 'package:gradus/src/core/widgets/custom_button.dart';
 import 'package:gradus/src/features/main/presentation/bloc/current_bloc/current_bloc.dart';
 import 'package:gradus/src/features/main/presentation/bloc/message_bloc/message_bloc.dart';
+import 'package:gradus/src/features/main/presentation/bloc/news_bloc/news_bloc.dart';
 import 'package:gradus/src/features/main/presentation/bloc/next_book_bloc/next_book_bloc.dart';
 import 'package:gradus/src/features/main/widgets/current_book_widget.dart';
 import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
@@ -214,9 +215,37 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-            NewsWidget(
-                url:
-                    'https://simg.marwin.kz/media/catalog/product/cache/41deb699a7fea062a8915debbbb0442c/1/3/1390157_1000.jpg')
+            BlocProvider(
+              create: (context) => NewsBloc()..add(LoadNewsEvent()),
+              child: BlocBuilder<NewsBloc, NewsState>(
+                builder: (context, state) {
+                  if (state is SuccessNewsState) {
+                    return SizedBox(
+                      height: state.items.length * 520,
+                      child: ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        itemCount: state.items.length,
+                        itemBuilder: (context, index) {
+                          return NewsWidget(
+                              description: state.items[index].desc,
+                              url: state.items[index].images);
+                        },
+                      ),
+                    );
+                  } else if (state is LoadingNewsState) {
+                    return CircularProgressIndicator(
+                      color: AppColors.buttonColor,
+                    );
+                  } else {
+                    return CustomButton(
+                        onTap: () {
+                          context.read<NewsBloc>().add(LoadNewsEvent());
+                        },
+                        btnText: 'btnText');
+                  }
+                },
+              ),
+            )
           ],
         ),
       ),
@@ -553,137 +582,126 @@ class _ProfilePageState extends State<ProfilePage> {
               child: CircularProgressIndicator(
               color: AppColors.buttonColor,
             ))
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: AppColors.grey,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 60,
-                          height: 60,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: const Color(0xff652DDC),
-                              border:
-                                  Border.all(color: Colors.white, width: 2)),
-                          child: Text(
-                            '#${_userRank ?? '-'}',
-                            style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _userProfileData?['teamName'] ?? "NO DATA",
-                              style: TextStyles.headerText,
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 60,
+                            height: 60,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: const Color(0xff652DDC),
+                                border:
+                                    Border.all(color: Colors.white, width: 2)),
+                            child: Text(
+                              '#${_userRank ?? '-'}',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 32,
+                                  fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              _userProfileData?['email'] ?? "NO DATA",
-                              style: TextStyles.simpleText,
-                            )
-                          ],
-                        ),
-                      ],
+                          ),
+                          const SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _userProfileData?['teamName'] ?? "NO DATA",
+                                style: TextStyles.headerText,
+                              ),
+                              Text(
+                                _userProfileData?['email'] ?? "NO DATA",
+                                style: TextStyles.simpleText,
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  // settings list
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: AppColors.grey,
-                      borderRadius: BorderRadius.circular(5),
+                    const SizedBox(height: 20),
+                    // settings list
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Column(
+                        children: [
+                          // one tile
+                          ProfileTile(
+                            onTap: () {},
+                            icon: Icons.person,
+                            title: "My Account",
+                            subtitle: "Make changes to your account",
+                          ),
+                          ProfileTile(
+                            onTap: () {},
+                            icon: Icons.person,
+                            title: "Saved Beneficiary",
+                            subtitle: "Make changes to your account",
+                          ),
+                          ProfileTile(
+                            onTap: () {},
+                            icon: Icons.security_rounded,
+                            title: "Two-Factor Authentication",
+                            subtitle: "Further secure your account for safety",
+                          ),
+                          ProfileTile(
+                            onTap: () {},
+                            icon: Icons.logout_outlined,
+                            isLogout: true,
+                            title: "Log out",
+                            subtitle: "Further secure your account for safety",
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Column(
-                      children: [
-                        // one tile
-                        ProfileTile(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ProfileInfoPage()));
-                          },
-                          icon: Icons.person,
-                          title: "My Account",
-                          subtitle: "Make changes to your account",
-                        ),
-                        ProfileTile(
-                          onTap: () {},
-                          icon: Icons.person,
-                          title: "Saved Beneficiary",
-                          subtitle: "Make changes to your account",
-                        ),
-                        ProfileTile(
-                          onTap: () {},
-                          icon: Icons.security_rounded,
-                          title: "Two-Factor Authentication",
-                          subtitle: "Further secure your account for safety",
-                        ),
-                        // log out from user profile
-                        ProfileTile(
-                          onTap: () async {
-                            await FirebaseAuth.instance.signOut();
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        InitializationPage()));
-                          },
-                          icon: Icons.logout_outlined,
-                          isLogout: true,
-                          title: "Log out",
-                          subtitle: "Further secure your account for safety",
-                        ),
-                      ],
+                    const SizedBox(height: 20),
+                    // more and more
+                    Text("More", style: TextStyles.headerText),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: AppColors.grey,
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      child: Column(
+                        children: [
+                          // one tile
+                          ProfileTile(
+                            onTap: () {},
+                            icon: Icons.notifications_outlined,
+                            title: "Help & Support",
+                            subtitle: "",
+                          ),
+                          ProfileTile(
+                            onTap: () {},
+                            icon: Icons.favorite_outline_rounded,
+                            title: "About App",
+                            subtitle: "",
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  // more and more
-                  Text("More", style: TextStyles.headerText),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 15, horizontal: 15),
-                    decoration: BoxDecoration(
-                      color: AppColors.grey,
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                    child: Column(
-                      children: [
-                        // one tile
-                        ProfileTile(
-                          onTap: () {},
-                          icon: Icons.notifications_outlined,
-                          title: "Help & Support",
-                          subtitle: "",
-                        ),
-                        ProfileTile(
-                          onTap: () {},
-                          icon: Icons.favorite_outline_rounded,
-                          title: "About App",
-                          subtitle: "",
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
     );
