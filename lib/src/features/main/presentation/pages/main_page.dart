@@ -17,11 +17,13 @@ import 'package:gradus/src/features/main/widgets/current_book_widget.dart';
 import 'package:gradus/src/features/main/widgets/enter_quiz_widget.dart';
 import 'package:gradus/src/features/main/widgets/message_send_field.dart';
 import 'package:gradus/src/features/main/widgets/message_tile_widget.dart';
+import 'package:gradus/src/features/main/widgets/news_widget.dart';
 import 'package:gradus/src/features/main/widgets/podium_widget.dart';
 import 'package:gradus/src/features/main/widgets/profile_tile.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
+import 'package:intl/intl.dart';
 
 import '../../widgets/leaderboard_tile.dart';
 
@@ -87,124 +89,136 @@ class HomePage extends StatelessWidget {
           'https://simg.marwin.kz/media/catalog/product/cache/8d1771fdd19ec2393e47701ba45e606d/f/u/fullimage_68_1.jpg',
     };
     return Scaffold(
-      backgroundColor: AppColors.mainColor,
+      backgroundColor: AppColors.sectionColor,
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Current Book',
-                style: TextStyles.headerText,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              BlocProvider(
-                create: (context) => CurrentBloc()..add(LoadCurrentEvent()),
-                child: BlocBuilder<CurrentBloc, CurrentState>(
-                  builder: (context, state) {
-                    if (state is LoadingCurrentState) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.buttonColor,
-                        ),
-                      );
-                    } else if (state is SuccessCurrentState) {
-                      return SizedBox(
-                        width: MediaQuery.of(context).size.width / 1.5,
-                        height: 77,
-                        child: ListView.builder(
-                          itemCount: state.items.length,
-                          itemBuilder: (context, index) {
-                            return CurrentBookWidget(
-                              bookName: state.items[index].bookName,
-                              page: state.items[index].page,
-                              image: state.items[index].image,
-                            );
-                          },
-                        ),
-                      );
-                    } else {
-                      return CustomButton(onTap: () {}, btnText: 'Try again');
-                    }
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                'Next Book',
-                style: TextStyles.headerText,
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              BlocProvider(
-                create: (context) => NextBookBloc()..add(LoadNextBookEvent()),
-                child: BlocBuilder<NextBookBloc, NextBookState>(
-                  builder: (context, state) {
-                    if (state is LoadingNextBookState) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: AppColors.buttonColor,
-                        ),
-                      );
-                    }
-                    if (state is SuccessNextBookState) {
-                      return SizedBox(
-                        height: (77 * state.items.length) +
-                            (20 * state.items.length.toDouble()),
-                        child: ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            itemCount: state.items.length,
-                            itemBuilder: (context, index) {
-                              return VoteTileWidget(
-                                  bookName: state.items[index].name,
-                                  page: state.items[index].page,
-                                  vote: state.items[index].vote);
-                            }),
-                      );
-                    } else {
-                      return CustomButton(
-                          onTap: () {}, btnText: 'Error accused');
-                    }
-                  },
-                ),
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Enter Quiz',
-                    style: TextStyles.headerText,
+                  SizedBox(
+                    height: 20,
                   ),
                   Text(
-                    'See all',
-                    style: TextStyles.miniText
-                        .copyWith(color: AppColors.buttonColor),
-                  )
+                    'Current Book',
+                    style: TextStyles.headerText,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  BlocProvider(
+                    create: (context) => CurrentBloc()..add(LoadCurrentEvent()),
+                    child: BlocBuilder<CurrentBloc, CurrentState>(
+                      builder: (context, state) {
+                        if (state is LoadingCurrentState) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.buttonColor,
+                            ),
+                          );
+                        } else if (state is SuccessCurrentState) {
+                          return SizedBox(
+                            width: MediaQuery.of(context).size.width / 1.5,
+                            height: 77,
+                            child: ListView.builder(
+                              itemCount: state.items.length,
+                              itemBuilder: (context, index) {
+                                return CurrentBookWidget(
+                                  bookName: state.items[index].bookName,
+                                  page: state.items[index].page,
+                                  image: state.items[index].image,
+                                );
+                              },
+                            ),
+                          );
+                        } else {
+                          return CustomButton(
+                              onTap: () {}, btnText: 'Try again');
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Text(
+                    'Next Book',
+                    style: TextStyles.headerText,
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  BlocProvider(
+                    create: (context) =>
+                        NextBookBloc()..add(LoadNextBookEvent()),
+                    child: BlocBuilder<NextBookBloc, NextBookState>(
+                      builder: (context, state) {
+                        if (state is LoadingNextBookState) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.buttonColor,
+                            ),
+                          );
+                        }
+                        if (state is SuccessNextBookState) {
+                          return SizedBox(
+                            height: (77 * state.items.length) +
+                                (20 * state.items.length.toDouble()),
+                            child: ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                itemCount: state.items.length,
+                                itemBuilder: (context, index) {
+                                  return VoteTileWidget(
+                                      bookName: state.items[index].name,
+                                      page: state.items[index].page,
+                                      vote: state.items[index].vote);
+                                }),
+                          );
+                        } else {
+                          return CustomButton(
+                              onTap: () {}, btnText: 'Error accused');
+                        }
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Enter Quiz',
+                        style: TextStyles.headerText,
+                      ),
+                      Text(
+                        'See all',
+                        style: TextStyles.miniText
+                            .copyWith(color: AppColors.buttonColor),
+                      )
+                    ],
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
+                  EnterQuizWidget(
+                    bookName: currentBook['bookName'],
+                    round: 5,
+                    questions: 25,
+                    image: 'assets/images/Frame.png',
+                  ),
+                  SizedBox(
+                    height: 20,
+                  ),
                 ],
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              EnterQuizWidget(
-                bookName: currentBook['bookName'],
-                round: 5,
-                questions: 25,
-                image: 'assets/images/Frame.png',
-              )
-            ],
-          ),
+            ),
+            NewsWidget(
+                url:
+                    'https://simg.marwin.kz/media/catalog/product/cache/41deb699a7fea062a8915debbbb0442c/1/3/1390157_1000.jpg')
+          ],
         ),
       ),
     );
@@ -373,7 +387,7 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const CustomAppBar(
-        title: 'Open Chat',
+        title: 'Open Chat ',
         backgroundColor: AppColors.mainColor,
         popAble: false,
       ),
@@ -407,7 +421,7 @@ class _ChatPageState extends State<ChatPage> {
                             children: [
                               Expanded(
                                 child: ListView.builder(
-                                  reverse: true,
+                                  reverse: false,
                                   itemCount: state.items.length,
                                   itemBuilder: (context, index) {
                                     final message = state.items[index];
@@ -441,11 +455,15 @@ class _ChatPageState extends State<ChatPage> {
                                   if (_formKey.currentState?.validate() ??
                                       false) {
                                     try {
+                                      DateTime now = DateTime.now();
+                                      int timestampInMilliseconds =
+                                          now.toUtc().millisecondsSinceEpoch;
                                       await FirebaseFirestore.instance
                                           .collection('chat')
                                           .add({
                                         'message': _messageController.text,
-                                        'username': userData?['teamName']
+                                        'username': userData?['teamName'],
+                                        'timestamp': timestampInMilliseconds
                                       });
                                       _messageController.clear();
 
@@ -456,7 +474,7 @@ class _ChatPageState extends State<ChatPage> {
                                       print('Error adding document: $e');
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(
-                                        const SnackBar(
+                                        SnackBar(
                                             content:
                                                 Text('Failed to add message')),
                                       );
@@ -464,7 +482,7 @@ class _ChatPageState extends State<ChatPage> {
                                   }
                                 },
                               ),
-                              const SizedBox(height: 20),
+                              SizedBox(height: 20),
                             ],
                           ),
                         ),
@@ -619,6 +637,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           title: "Two-Factor Authentication",
                           subtitle: "Further secure your account for safety",
                         ),
+                        // log out from user profile
                         ProfileTile(
                           onTap: () async {
                             await FirebaseAuth.instance.signOut();
