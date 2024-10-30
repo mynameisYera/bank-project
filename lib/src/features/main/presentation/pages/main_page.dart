@@ -23,7 +23,6 @@ import 'package:gradus/src/features/main/widgets/profile_tile.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
-import 'package:intl/intl.dart';
 
 import '../../widgets/leaderboard_tile.dart';
 
