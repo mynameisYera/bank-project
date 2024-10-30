@@ -1,15 +1,20 @@
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/theme/text_theme.dart';
 
 class NewsWidget extends StatelessWidget {
-  final String url;
-  const NewsWidget({super.key, required this.url});
+  final List<String> url;
+  final String description;
+
+  const NewsWidget({super.key, required this.url, required this.description});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
@@ -29,7 +34,6 @@ class NewsWidget extends StatelessWidget {
                   width: 20,
                 ),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
@@ -48,12 +52,48 @@ class NewsWidget extends StatelessWidget {
           SizedBox(
             height: 20,
           ),
-          Container(
-            width: double.infinity,
-            height: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: NetworkImage(url), fit: BoxFit.cover)),
+          CarouselSlider(
+              items: url.map((imageUrl) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                      width: double.infinity,
+                      margin: EdgeInsets.symmetric(horizontal: 5),
+                      height: MediaQuery.of(context).size.width + 5,
+                      decoration: BoxDecoration(
+                          image: DecorationImage(
+                              image: NetworkImage(imageUrl),
+                              fit: BoxFit.cover)),
+                    );
+                  },
+                );
+              }).toList(),
+              options: CarouselOptions(
+                height: MediaQuery.of(context).size.width,
+                viewportFraction: 1.0,
+              )),
+          SizedBox(
+            height: 20,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Text(
+              description,
+              style: TextStyles.simpleText,
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Text(
+              'Alisher Zhunissov',
+              style: TextStyles.miniText.copyWith(color: AppColors.buttonColor),
+            ),
+          ),
+          SizedBox(
+            height: 20,
           )
         ],
       ),
