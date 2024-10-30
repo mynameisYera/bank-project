@@ -644,7 +644,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           // one tile
                           ProfileTile(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileInfoPage()));
+                            },
                             icon: Icons.person,
                             title: "My Account",
                             subtitle: "Make changes to your account",
