@@ -532,39 +532,44 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final CollectionReference _firestore =
+      FirebaseFirestore.instance.collection('users');
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  Map<String, dynamic>? userData;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadUserData();
-  }
+  Map<String, dynamic>? _userProfileData;
+  int? _userRank;
 
   Future<void> _loadUserData() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      DocumentSnapshot snapshot =
-          await _firestore.collection('users').doc(user.uid).get();
+      DocumentSnapshot userSnapshot = await _firestore.doc(user.uid).get();
+      QuerySnapshot leaderboardSnapshot = await _firestore.get();
+
+      final leaderboardData = leaderboardSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      // sorting to get the place
+      leaderboardData
+          .sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+      // team rank
+      _userRank = leaderboardData
+              .indexWhere((team) => team['email'] == userSnapshot['email']) +
+          1;
+
       setState(() {
-        userData = snapshot.data() as Map<String, dynamic>?;
+        _userProfileData = userSnapshot.data() as Map<String, dynamic>?;
       });
     }
   }
 
+  @override
+  void initState() {
+    _loadUserData();
+    super.initState();
+  }
+
   // how to get user data: userData?['teamName']
-  // CustomButton(
-  //                   onTap: () async {
-  //                     await FirebaseAuth.instance.signOut();
-  //                     Navigator.push(
-  //                         context,
-  //                         MaterialPageRoute(
-  //                             builder: (context) => InitializationPage()));
-  //                   },
-  //                   btnText: 'Sign Out',
-  //                 )
 
   @override
   Widget build(BuildContext context) {
@@ -573,7 +578,7 @@ class _ProfilePageState extends State<ProfilePage> {
           title: 'Profile',
           backgroundColor: AppColors.mainColor,
           popAble: false),
-      body: userData == null
+      body: _userProfileData == null
           ? const Center(
               child: CircularProgressIndicator(
               color: AppColors.buttonColor,
@@ -602,8 +607,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 color: const Color(0xff652DDC),
                                 border:
                                     Border.all(color: Colors.white, width: 2)),
-                            child: const Text(
-                              '#1',
+                            child: Text(
+                              '#${_userRank ?? '-'}',
                               style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 32,
@@ -615,11 +620,11 @@ class _ProfilePageState extends State<ProfilePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                userData?['teamName'],
+                                _userProfileData?['teamName'] ?? "NO DATA",
                                 style: TextStyles.headerText,
                               ),
                               Text(
-                                userData?['email'],
+                                _userProfileData?['email'] ?? "NO DATA",
                                 style: TextStyles.simpleText,
                               )
                             ],
@@ -700,6 +705,245 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
+    );
+  }
+}
+
+class ProfileInfoPage extends StatefulWidget {
+  const ProfileInfoPage({super.key});
+
+  @override
+  State<ProfileInfoPage> createState() => _ProfileInfoPageState();
+}
+
+class _ProfileInfoPageState extends State<ProfileInfoPage> {
+  final CollectionReference _firestore =
+      FirebaseFirestore.instance.collection('users');
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  Map<String, dynamic>? _userProfileData;
+  int? _userRank;
+
+  Future<void> _loadUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot userSnapshot = await _firestore.doc(user.uid).get();
+      QuerySnapshot leaderboardSnapshot = await _firestore.get();
+
+      final leaderboardData = leaderboardSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+
+      // sorting to get the place
+      leaderboardData
+          .sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
+
+      // team rank
+      _userRank = leaderboardData
+              .indexWhere((team) => team['email'] == userSnapshot['email']) +
+          1;
+
+      setState(() {
+        _userProfileData = userSnapshot.data() as Map<String, dynamic>?;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    _loadUserData();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.mainColor,
+      appBar: const CustomAppBar(
+        title: "Profile",
+        backgroundColor: AppColors.mainColor,
+        popAble: true,
+      ),
+      body: Center(
+        child: _userProfileData == null
+            ? const CircularProgressIndicator(color: AppColors.buttonColor)
+            : Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          width: 100,
+                          height: 100,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: const Color(0xff652DDC),
+                              border: Border.all(
+                                  color: const Color(0xff393939), width: 4)),
+                          child: Text(
+                            '#${_userRank ?? '-'}',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 52,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(
+                          _userProfileData?['teamName'] ?? 'NO DATA',
+                          style: TextStyles.headerText,
+                        ),
+                        Text(
+                            'Score: ${_userProfileData?['score']}' ?? 'NO DATA',
+                            style: TextStyles.miniText),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // captain name
+                            Text('Captain Name', style: TextStyles.simpleText),
+                            const SizedBox(height: 10),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              alignment: Alignment.centerLeft,
+                              width: double.infinity,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.grey,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Text(
+                                _userProfileData?['memberNames'][0] ??
+                                    'Captain',
+                                style: TextStyles.simpleText,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+
+                            // email
+                            Text('Email', style: TextStyles.simpleText),
+                            const SizedBox(height: 10),
+                            Container(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              alignment: Alignment.centerLeft,
+                              width: double.infinity,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                color: AppColors.grey,
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Text(
+                                _userProfileData?['email'] ?? 'Email',
+                                style: TextStyles.simpleText,
+                              ),
+                            ),
+                            const SizedBox(height: 30),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                        color: AppColors.grey,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          _userProfileData?['memberNames'][0] ??
+                                              'Player #1',
+                                          style: TextStyles.simpleText,
+                                        ),
+                                        CircleAvatar(
+                                            radius: 30,
+                                            child: Image.asset(
+                                                'assets/images/ava2.png')),
+                                        Text('290 pages',
+                                            style: TextStyles.miniText),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Container(
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                        color: AppColors.grey,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          _userProfileData?['memberNames'][1] ??
+                                              'Player #2',
+                                          style: TextStyles.simpleText,
+                                        ),
+                                        CircleAvatar(
+                                            radius: 30,
+                                            child: Image.asset(
+                                                'assets/images/ava2.png')),
+                                        Text('290 pages',
+                                            style: TextStyles.miniText),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Container(
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                        color: AppColors.grey,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Text(
+                                          _userProfileData?['memberNames'][2] ??
+                                              'Player #3',
+                                          style: TextStyles.simpleText,
+                                        ),
+                                        CircleAvatar(
+                                            radius: 30,
+                                            child: Image.asset(
+                                                'assets/images/ava2.png')),
+                                        Text('290 pages',
+                                            style: TextStyles.miniText),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    CustomButton(
+                      onTap: () async {
+                        await FirebaseAuth.instance.signOut();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => InitializationPage()));
+                      },
+                      btnText: 'Sign Out',
+                    )
+                  ],
+                ),
+              ),
+      ),
     );
   }
 }
