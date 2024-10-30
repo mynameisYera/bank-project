@@ -18,8 +18,6 @@ class NewsBloc extends Bloc<NewsEvent, NewsState> {
           await FirebaseFirestore.instance.collection('news').get();
       print(NewsEntity.fromDocumentList(snapshot.docs));
       List<NewsEntity> messages = NewsEntity.fromDocumentList(snapshot.docs);
-
-      print('DATA: $messages');
       emit(SuccessNewsState(items: messages));
     } catch (e) {
       emit(FailureNewsState(error: e.toString()));
