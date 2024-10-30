@@ -16,7 +16,8 @@ class CurrentEntity extends Equatable {
     final data = doc.data() as Map<String, dynamic>;
     return CurrentEntity(
       bookName: data['bookName'] ?? '',
-      image: data['image'] ?? '',
+      image: data['image'] ??
+          'https://static.vecteezy.com/system/resources/previews/049/334/767/non_2x/no-photo-or-is-allowed-sign-illustration-prohibited-sticker-vector.jpg',
       page: data['page'] ?? 0,
     );
   }

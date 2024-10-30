@@ -30,17 +30,6 @@ class NextBookBloc extends Bloc<NextBookEvent, NextBookState> {
       AddVoteEvent event, Emitter<NextBookState> emit) async {
     emit(LoadingNextBookState());
     try {
-      QuerySnapshot querySnapshot =
-          await FirebaseFirestore.instance.collection('nextBook').get();
-      for (var doc in querySnapshot.docs) {
-        List<dynamic> voters =
-            (doc.data() as Map<String, dynamic>)['voters'] ?? [];
-        if (voters.contains(event.userId)) {
-          emit(FailureNextBookState(error: "You have already voted"));
-          return;
-        }
-      }
-
       DocumentReference bookRef =
           FirebaseFirestore.instance.collection('nextBook').doc(event.bookId);
 
@@ -48,18 +37,20 @@ class NextBookBloc extends Bloc<NextBookEvent, NextBookState> {
         DocumentSnapshot snapshot = await transaction.get(bookRef);
 
         if (snapshot.exists) {
-          List<dynamic> voters =
-              (snapshot.data() as Map<String, dynamic>)['voters'] ?? [];
+          Map<String, dynamic> data = snapshot.data() as Map<String, dynamic>;
+          List<dynamic> voters = data['voters'] ?? [];
+          int currentVote = data['vote'] ?? 0;
 
-          if (!voters.contains(event.userId)) {
-            int currentVote = snapshot.get('vote') ?? 0;
-
+          if (voters.contains(event.userId)) {
+            transaction.update(bookRef, {
+              'vote': currentVote > 0 ? currentVote - 1 : 0,
+              'voters': FieldValue.arrayRemove([event.userId])
+            });
+          } else {
             transaction.update(bookRef, {
               'vote': currentVote + 1,
               'voters': FieldValue.arrayUnion([event.userId])
             });
-          } else {
-            throw Exception("User has already voted");
           }
         } else {
           throw Exception("Document does not exist");

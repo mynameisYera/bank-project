@@ -268,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                       builder: (context, state) {
                         if (state is SuccessNewsState) {
                           return SizedBox(
-                            height: state.items.length * 520,
+                            height: state.items.length * 530,
                             child: ListView.builder(
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: state.items.length,
@@ -406,7 +406,7 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: SizedBox(
-                          height: _leaderboardData.length * 65,
+                          height: _leaderboardData.length * 70,
                           child: ListView.separated(
                               physics: NeverScrollableScrollPhysics(),
                               itemCount: _leaderboardData.length - 3,

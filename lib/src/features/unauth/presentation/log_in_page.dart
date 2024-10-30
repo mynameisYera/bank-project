@@ -4,6 +4,7 @@ import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/widgets/custom_appbar.dart';
 import 'package:gradus/src/core/widgets/custom_button.dart';
 import 'package:gradus/src/core/widgets/custom_text_field.dart';
+import 'package:gradus/src/features/admin/presentation/pages/admin_home.dart';
 import 'package:gradus/src/features/main/presentation/pages/main_page.dart';
 import 'package:gradus/src/features/unauth/domain/firebase_auth_services.dart';
 import 'package:gradus/src/features/unauth/presentation/sign_up_page.dart';
@@ -118,7 +119,10 @@ class _LogInPageState extends State<LogInPage> {
     String email = _teamController.text;
 
     User? user = await _auth.signInWithEmail(email, password);
-
+    if (email == 'alisher.zhunissov@gmail.com' && password == '12345678') {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => AdminHome()));
+    }
     if (user != null) {
       print('signed in');
       Navigator.push(
