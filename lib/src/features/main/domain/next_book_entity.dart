@@ -2,11 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 class NextBookEntity extends Equatable {
+  final String id; // Add an id field for Firestore document ID
   final String name;
   final int page;
   final int vote;
 
   const NextBookEntity({
+    required this.id,
     required this.name,
     required this.page,
     required this.vote,
@@ -15,6 +17,7 @@ class NextBookEntity extends Equatable {
   factory NextBookEntity.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return NextBookEntity(
+      id: doc.id,
       name: data['name'] ?? '',
       page: data['page'] ?? 0,
       vote: data['vote'] ?? 0,
@@ -28,5 +31,5 @@ class NextBookEntity extends Equatable {
   }
 
   @override
-  List<Object?> get props => [name, page, vote];
+  List<Object?> get props => [id, name, page, vote];
 }

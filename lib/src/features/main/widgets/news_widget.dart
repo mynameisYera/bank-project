@@ -93,8 +93,14 @@ class NewsWidget extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height: 20,
-          )
+            height: 5,
+          ),
+          Divider(
+            color: Colors.white,
+          ),
+          SizedBox(
+            height: 5,
+          ),
         ],
       ),
     );

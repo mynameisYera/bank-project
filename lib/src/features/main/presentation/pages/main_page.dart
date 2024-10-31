@@ -75,8 +75,35 @@ class _NavPageState extends State<NavPage> {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      DocumentSnapshot snapshot =
+          await _firestore.collection('users').doc(user.uid).get();
+      setState(() {
+        userData = snapshot.data() as Map<String, dynamic>?;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,95 +115,180 @@ class HomePage extends StatelessWidget {
     };
     return Scaffold(
       backgroundColor: AppColors.sectionColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
+      body: userData == null
+          ? const Center(
+              child: CircularProgressIndicator(
+              color: AppColors.buttonColor,
+            ))
+          : SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Current Book',
-                    style: TextStyles.headerText,
-                  ),
-                  SizedBox(
-                    height: 20,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          'Current Book',
+                          style: TextStyles.headerText,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        BlocProvider(
+                          create: (context) =>
+                              CurrentBloc()..add(LoadCurrentEvent()),
+                          child: BlocBuilder<CurrentBloc, CurrentState>(
+                            builder: (context, state) {
+                              if (state is LoadingCurrentState) {
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.buttonColor,
+                                  ),
+                                );
+                              } else if (state is SuccessCurrentState) {
+                                return SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.5,
+                                  height: 77,
+                                  child: ListView.builder(
+                                    itemCount: state.items.length,
+                                    itemBuilder: (context, index) {
+                                      return CurrentBookWidget(
+                                        bookName: state.items[index].bookName,
+                                        page: state.items[index].page,
+                                        image: state.items[index].image,
+                                      );
+                                    },
+                                  ),
+                                );
+                              } else {
+                                return CustomButton(
+                                    onTap: () {
+                                      context
+                                          .read<NewsBloc>()
+                                          .add(LoadNewsEvent());
+                                    },
+                                    btnText: 'Try again');
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          'Next Book',
+                          style: TextStyles.headerText,
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        BlocProvider(
+                          create: (context) =>
+                              NextBookBloc()..add(LoadNextBookEvent()),
+                          child: BlocBuilder<NextBookBloc, NextBookState>(
+                            builder: (context, state) {
+                              if (state is LoadingNextBookState) {
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors.buttonColor,
+                                  ),
+                                );
+                              }
+                              if (state is SuccessNextBookState) {
+                                return SizedBox(
+                                  height: (77 * state.items.length) +
+                                      (20 * state.items.length.toDouble()),
+                                  child: ListView.builder(
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemCount: state.items.length,
+                                    itemBuilder: (context, index) {
+                                      return VoteTileWidget(
+                                        onTap: () {
+                                          final bookId = state.items[index].id;
+                                          context.read<NextBookBloc>().add(
+                                              AddVoteEvent(bookId,
+                                                  userData?['teamName']));
+                                        },
+                                        bookName: state.items[index].name,
+                                        page: state.items[index].page,
+                                        vote: state.items[index].vote,
+                                      );
+                                    },
+                                  ),
+                                );
+                              } else {
+                                return CustomButton(
+                                  onTap: () {},
+                                  btnText: 'You already voted',
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Enter Quiz',
+                              style: TextStyles.headerText,
+                            ),
+                            Text(
+                              'See all',
+                              style: TextStyles.miniText
+                                  .copyWith(color: AppColors.buttonColor),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        EnterQuizWidget(
+                          bookName: currentBook['bookName'],
+                          round: 5,
+                          questions: 25,
+                          image: 'assets/images/Frame.png',
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                      ],
+                    ),
                   ),
                   BlocProvider(
-                    create: (context) => CurrentBloc()..add(LoadCurrentEvent()),
-                    child: BlocBuilder<CurrentBloc, CurrentState>(
+                    create: (context) => NewsBloc()..add(LoadNewsEvent()),
+                    child: BlocBuilder<NewsBloc, NewsState>(
                       builder: (context, state) {
-                        if (state is LoadingCurrentState) {
-                          return Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.buttonColor,
-                            ),
-                          );
-                        } else if (state is SuccessCurrentState) {
+                        if (state is SuccessNewsState) {
                           return SizedBox(
-                            width: MediaQuery.of(context).size.width / 1.5,
-                            height: 77,
+                            height: state.items.length * 530,
                             child: ListView.builder(
+                              physics: NeverScrollableScrollPhysics(),
                               itemCount: state.items.length,
                               itemBuilder: (context, index) {
-                                return CurrentBookWidget(
-                                  bookName: state.items[index].bookName,
-                                  page: state.items[index].page,
-                                  image: state.items[index].image,
-                                );
+                                return NewsWidget(
+                                    description: state.items[index].desc,
+                                    url: state.items[index].images);
                               },
                             ),
                           );
-                        } else {
-                          return CustomButton(
-                              onTap: () {}, btnText: 'Try again');
-                        }
-                      },
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Text(
-                    'Next Book',
-                    style: TextStyles.headerText,
-                  ),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  BlocProvider(
-                    create: (context) =>
-                        NextBookBloc()..add(LoadNextBookEvent()),
-                    child: BlocBuilder<NextBookBloc, NextBookState>(
-                      builder: (context, state) {
-                        if (state is LoadingNextBookState) {
-                          return Center(
-                            child: CircularProgressIndicator(
-                              color: AppColors.buttonColor,
-                            ),
-                          );
-                        }
-                        if (state is SuccessNextBookState) {
-                          return SizedBox(
-                            height: (77 * state.items.length) +
-                                (20 * state.items.length.toDouble()),
-                            child: ListView.builder(
-                                physics: NeverScrollableScrollPhysics(),
-                                itemCount: state.items.length,
-                                itemBuilder: (context, index) {
-                                  return VoteTileWidget(
-                                      bookName: state.items[index].name,
-                                      page: state.items[index].page,
-                                      vote: state.items[index].vote);
-                                }),
+                        } else if (state is LoadingNewsState) {
+                          return CircularProgressIndicator(
+                            color: AppColors.buttonColor,
                           );
                         } else {
                           return CustomButton(
-                              onTap: () {}, btnText: 'Error accused');
+                              onTap: () {
+                                context.read<NewsBloc>().add(LoadNewsEvent());
+                              },
+                              btnText: 'btnText');
                         }
                       },
                     ),
@@ -218,40 +330,6 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-            BlocProvider(
-              create: (context) => NewsBloc()..add(LoadNewsEvent()),
-              child: BlocBuilder<NewsBloc, NewsState>(
-                builder: (context, state) {
-                  if (state is SuccessNewsState) {
-                    return SizedBox(
-                      height: state.items.length * 520,
-                      child: ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        itemCount: state.items.length,
-                        itemBuilder: (context, index) {
-                          return NewsWidget(
-                              description: state.items[index].desc,
-                              url: state.items[index].images);
-                        },
-                      ),
-                    );
-                  } else if (state is LoadingNewsState) {
-                    return CircularProgressIndicator(
-                      color: AppColors.buttonColor,
-                    );
-                  } else {
-                    return CustomButton(
-                        onTap: () {
-                          context.read<NewsBloc>().add(LoadNewsEvent());
-                        },
-                        btnText: 'btnText');
-                  }
-                },
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 }
@@ -323,75 +401,81 @@ class _LeaderboardsPageState extends State<LeaderboardsPage> {
             ? const CircularProgressIndicator(
                 color: AppColors.buttonColor,
               )
-            : Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-                child: Stack(
-                  children: [
-                    // podium
-                    SizedBox(
-                      height: 310,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          // rank2
-                          if (_leaderboardData.length > 1)
-                            PodiumWidget(
-                              rankPicture: 'Rank2.svg',
-                              score: _leaderboardData[1]['score'],
-                              teamName: _leaderboardData[1]['teamName'],
-                              imageLogo: 'Avatar.png',
-                            ),
+            : SingleChildScrollView(
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                  child: Stack(
+                    children: [
+                      // podium
+                      SizedBox(
+                        height: 310,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // rank2
+                            if (_leaderboardData.length > 1)
+                              PodiumWidget(
+                                rankPicture: 'Rank2.svg',
+                                score: _leaderboardData[1]['score'],
+                                teamName: _leaderboardData[1]['teamName'],
+                                imageLogo: 'Avatar.png',
+                              ),
 
-                          // rank1
-                          if (_leaderboardData.isNotEmpty)
-                            PodiumWidget(
-                              rankPicture: 'rank1.svg',
-                              score: _leaderboardData[0]['score'],
-                              teamName: _leaderboardData[0]['teamName'],
-                              imageLogo: 'Avatar.png',
-                            ),
+                            // rank1
+                            if (_leaderboardData.isNotEmpty)
+                              PodiumWidget(
+                                rankPicture: 'rank1.svg',
+                                score: _leaderboardData[0]['score'],
+                                teamName: _leaderboardData[0]['teamName'],
+                                imageLogo: 'Avatar.png',
+                              ),
 
-                          // rank3
-                          if (_leaderboardData.length > 2)
-                            PodiumWidget(
-                              rankPicture: 'rank3.svg',
-                              score: _leaderboardData[2]['score'],
-                              teamName: _leaderboardData[2]['teamName'],
-                              imageLogo: 'Avatar.png',
-                            ),
-                        ],
+                            // rank3
+                            if (_leaderboardData.length > 2)
+                              PodiumWidget(
+                                rankPicture: 'rank3.svg',
+                                score: _leaderboardData[2]['score'],
+                                teamName: _leaderboardData[2]['teamName'],
+                                imageLogo: 'Avatar.png',
+                              ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    // list of the items starting from 4 place
-                    Container(
-                      margin: const EdgeInsets.only(top: 300),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      decoration: BoxDecoration(
-                        color: const Color(0xff262626),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: ListView.separated(
-                          itemCount: _leaderboardData.length - 3,
-                          separatorBuilder: (context, index) {
-                            return const SizedBox(height: 16);
-                          },
-                          itemBuilder: (context, index) {
-                            final item = _leaderboardData[index + 3];
+                      // list of the items starting from 4 place
+                      Container(
+                        margin: const EdgeInsets.only(top: 300),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
+                        decoration: BoxDecoration(
+                          color: const Color(0xff262626),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: SizedBox(
+                          height: _leaderboardData.length * 70,
+                          child: ListView.separated(
+                              physics: NeverScrollableScrollPhysics(),
+                              itemCount: _leaderboardData.length - 3,
+                              separatorBuilder: (context, index) {
+                                return const SizedBox(height: 16);
+                              },
+                              itemBuilder: (context, index) {
+                                final item = _leaderboardData[index + 3];
 
-                            return CustomTile(
-                              place: index + 4,
-                              score: item['score'],
-                              teamName: item['teamName'],
-                            );
-                          }),
-                    ),
-                  ],
+                                return CustomTile(
+                                  place: index + 4,
+                                  score: item['score'],
+                                  teamName: item['teamName'],
+                                );
+                              }),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
       ),
