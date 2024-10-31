@@ -20,6 +20,7 @@ import 'package:gradus/src/features/main/widgets/message_tile_widget.dart';
 import 'package:gradus/src/features/main/widgets/news_widget.dart';
 import 'package:gradus/src/features/main/widgets/podium_widget.dart';
 import 'package:gradus/src/features/main/widgets/profile_tile.dart';
+import 'package:gradus/src/features/main/widgets/quiz_question_widget.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -315,7 +316,8 @@ class _HomePageState extends State<HomePage> {
                   ),
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => QuizPage()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => QuizPage()));
                     },
                     child: EnterQuizWidget(
                       bookName: currentBook['bookName'],
@@ -342,10 +344,135 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+  final PageController _pageController = PageController(initialPage: 0);
+
+  int _currentRound = 1;
+  int _currentQuestionIndex = 0;
+
+  List<String> _currentQuestions = [];
+  Map<String, Map<String, String>> _allAnswers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadQuestionsForRound();
+  }
+
+  Future<void> _loadQuestionsForRound() async {
+  final doc = await FirebaseFirestore.instance.collection('quiz').doc('game1').get();
+  final data = doc.data();
+
+  if (data != null && data.containsKey('round$_currentRound')) {
+    final roundData = Map<String, dynamic>.from(data['round$_currentRound']);
+    final sortedQuestions = roundData.keys.toList()
+      ..sort(); 
+    
+    setState(() {
+      _currentQuestions = sortedQuestions.map((key) => roundData[key].toString()).toList();
+      _currentQuestionIndex = 0;
+      _allAnswers['round$_currentRound'] = {}; 
+    });
+  } else {
+    print("No more rounds available.");
+  }
+}
+
+
+  void _handleNextButton(BuildContext context) {
+    if (_currentQuestionIndex < _currentQuestions.length - 1) {
+      setState(() {
+        _currentQuestionIndex++;
+      });
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    } else {
+      _submitAnswers();
+      if (_currentRound < 5) {
+        _startNewRound();
+      } else {
+        _showQuizCompletionDialog(context);
+      }
+    }
+  }
+
+  Future<void> _submitAnswers() async {
+     await FirebaseFirestore.instance.collection('answers').doc('game1').set({
+      'round$_currentRound': _allAnswers['round$_currentRound'],
+    }, SetOptions(merge: true));
+  }
+
+  void _startNewRound() {
+    setState(() {
+      _currentRound++;
+    });
+    _loadQuestionsForRound();
+    _pageController.jumpToPage(0);
+  }
+
+  void _showQuizCompletionDialog(context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.grey,
+        title: Text("Quiz Completed", style: TextStyles.headerText,),
+        content: Text("You've finished all rounds!", style: TextStyles.simpleText,),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: CustomButton(onTap: () {
+              Navigator.pop(context);
+            }, btnText: "OK"),
+          ),
+        ],
+      ),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      appBar: CustomAppBar(
+          title: "Round $_currentRound",
+          backgroundColor: AppColors.mainColor,
+          popAble: true),
+      body: Center(
+        child: Stack(
+          children: [
+            if (_currentQuestions.isNotEmpty) ...[
+              PageView.builder(
+                controller: _pageController,
+                itemCount: _currentQuestions.length,
+                itemBuilder: (context, index) {
+                  return QuizQuestionWidget(
+                    question: _currentQuestions[index],
+                    onAnswerChanged: (answer) {
+                      _allAnswers['round$_currentRound']!['question${index + 1}'] = answer;
+                    },
+                  );
+                },
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                alignment: Alignment.bottomCenter,
+                child: CustomButton(
+                    onTap: () => _handleNextButton(context),
+                    btnText:
+                        _currentQuestionIndex == _currentQuestions.length - 1
+                            ? "Finish"
+                            : "Next"),
+              ),
+            ] else
+              Center(
+                child: CircularProgressIndicator(color: AppColors.buttonColor,)
+              ),
+          ],
+        ),
+      ),
     );
   }
 }
