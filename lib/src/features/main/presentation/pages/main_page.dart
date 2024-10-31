@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gradus/main.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
 import 'package:gradus/src/core/theme/text_theme.dart';
@@ -23,7 +22,6 @@ import 'package:gradus/src/features/main/widgets/podium_widget.dart';
 import 'package:gradus/src/features/main/widgets/profile_tile.dart';
 import 'package:gradus/src/features/main/widgets/vote_tile_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
 
 import '../../widgets/leaderboard_tile.dart';
 
@@ -203,11 +201,16 @@ class HomePage extends StatelessWidget {
                   SizedBox(
                     height: 20,
                   ),
-                  EnterQuizWidget(
-                    bookName: currentBook['bookName'],
-                    round: 5,
-                    questions: 25,
-                    image: 'assets/images/Frame.png',
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => QuizPage()));
+                    },
+                    child: EnterQuizWidget(
+                      bookName: currentBook['bookName'],
+                      round: 5,
+                      questions: 25,
+                      image: 'assets/images/Frame.png',
+                    ),
                   ),
                   SizedBox(
                     height: 20,
@@ -249,6 +252,22 @@ class HomePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class QuizPage extends StatefulWidget {
+  const QuizPage({super.key});
+
+  @override
+  State<QuizPage> createState() => _QuizPageState();
+}
+
+class _QuizPageState extends State<QuizPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      
     );
   }
 }
@@ -610,7 +629,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               '#${_userRank ?? '-'}',
                               style: TextStyle(
                                   color: Colors.white,
-                                  fontSize: 32,
+                                  fontSize: _userRank! >= 10 ? 22 : 32,
                                   fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -645,7 +664,13 @@ class _ProfilePageState extends State<ProfilePage> {
                           // one tile
                           ProfileTile(
                             onTap: () {
-                              Navigator.push(context, MaterialPageRoute(builder: (context) => ProfileInfoPage()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProfileInfoPage(
+                                            userRank: _userRank,
+                                            userProfileData: _userProfileData,
+                                          )));
                             },
                             icon: Icons.person,
                             title: "My Account",
@@ -664,11 +689,18 @@ class _ProfilePageState extends State<ProfilePage> {
                             subtitle: "Further secure your account for safety",
                           ),
                           ProfileTile(
-                            onTap: () {},
+                            onTap: () async {
+                              await FirebaseAuth.instance.signOut();
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          InitializationPage()));
+                            },
                             icon: Icons.logout_outlined,
                             isLogout: true,
                             title: "Log out",
-                            subtitle: "Further secure your account for safety",
+                            subtitle: "Log out from your Account",
                           ),
                         ],
                       ),
@@ -686,7 +718,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       child: Column(
                         children: [
-                          // one tile
                           ProfileTile(
                             onTap: () {},
                             icon: Icons.notifications_outlined,
@@ -711,50 +742,16 @@ class _ProfilePageState extends State<ProfilePage> {
 }
 
 class ProfileInfoPage extends StatefulWidget {
-  const ProfileInfoPage({super.key});
+  const ProfileInfoPage(
+      {super.key, required this.userProfileData, required this.userRank});
+  final int? userRank;
+  final Map<String, dynamic>? userProfileData;
 
   @override
   State<ProfileInfoPage> createState() => _ProfileInfoPageState();
 }
 
 class _ProfileInfoPageState extends State<ProfileInfoPage> {
-  final CollectionReference _firestore =
-      FirebaseFirestore.instance.collection('users');
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  Map<String, dynamic>? _userProfileData;
-  int? _userRank;
-
-  Future<void> _loadUserData() async {
-    User? user = _auth.currentUser;
-    if (user != null) {
-      DocumentSnapshot userSnapshot = await _firestore.doc(user.uid).get();
-      QuerySnapshot leaderboardSnapshot = await _firestore.get();
-
-      final leaderboardData = leaderboardSnapshot.docs
-          .map((doc) => doc.data() as Map<String, dynamic>)
-          .toList();
-
-      // sorting to get the place
-      leaderboardData
-          .sort((a, b) => (b['score'] as int).compareTo(a['score'] as int));
-
-      // team rank
-      _userRank = leaderboardData
-              .indexWhere((team) => team['email'] == userSnapshot['email']) +
-          1;
-
-      setState(() {
-        _userProfileData = userSnapshot.data() as Map<String, dynamic>?;
-      });
-    }
-  }
-
-  @override
-  void initState() {
-    _loadUserData();
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -765,7 +762,7 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
         popAble: true,
       ),
       body: Center(
-        child: _userProfileData == null
+        child: widget.userProfileData == null
             ? const CircularProgressIndicator(color: AppColors.buttonColor)
             : Padding(
                 padding:
@@ -785,20 +782,19 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                               border: Border.all(
                                   color: const Color(0xff393939), width: 4)),
                           child: Text(
-                            '#${_userRank ?? '-'}',
-                            style: const TextStyle(
+                            '#${widget.userRank ?? '-'}',
+                            style: TextStyle(
                                 color: Colors.white,
-                                fontSize: 52,
+                                fontSize: widget.userRank! >= 10 ? 37 : 42,
                                 fontWeight: FontWeight.bold),
                           ),
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          _userProfileData?['teamName'] ?? 'NO DATA',
+                          widget.userProfileData?['teamName'] ?? 'NO DATA',
                           style: TextStyles.headerText,
                         ),
-                        Text(
-                            'Score: ${_userProfileData?['score']}' ?? 'NO DATA',
+                        Text('Score: ${widget.userProfileData?['score']}',
                             style: TextStyles.miniText),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -817,7 +813,7 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Text(
-                                _userProfileData?['memberNames'][0] ??
+                                widget.userProfileData?['memberNames'][0] ??
                                     'Captain',
                                 style: TextStyles.simpleText,
                               ),
@@ -838,7 +834,7 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Text(
-                                _userProfileData?['email'] ?? 'Email',
+                                widget.userProfileData?['email'] ?? 'Email',
                                 style: TextStyles.simpleText,
                               ),
                             ),
@@ -857,7 +853,8 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Text(
-                                          _userProfileData?['memberNames'][0] ??
+                                          widget.userProfileData?['memberNames']
+                                                  [0] ??
                                               'Player #1',
                                           style: TextStyles.simpleText,
                                         ),
@@ -884,7 +881,8 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Text(
-                                          _userProfileData?['memberNames'][1] ??
+                                          widget.userProfileData?['memberNames']
+                                                  [1] ??
                                               'Player #2',
                                           style: TextStyles.simpleText,
                                         ),
@@ -911,7 +909,8 @@ class _ProfileInfoPageState extends State<ProfileInfoPage> {
                                           MainAxisAlignment.spaceEvenly,
                                       children: [
                                         Text(
-                                          _userProfileData?['memberNames'][2] ??
+                                          widget.userProfileData?['memberNames']
+                                                  [2] ??
                                               'Player #3',
                                           style: TextStyles.simpleText,
                                         ),

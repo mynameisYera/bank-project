@@ -30,8 +30,8 @@ class ProfileTile extends StatelessWidget {
             Row(
               children: [
                 Container(
-                  width: 40,
-                  height: 40,
+                  width: 45,
+                  height: 45,
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: Color(0xff535353),
@@ -47,9 +47,10 @@ class ProfileTile extends StatelessWidget {
                   children: [
                     Text(
                       title,
+                      overflow: TextOverflow.ellipsis,
                       style: isLogout == true
                           ? const TextStyle(
-                              fontSize: 14,
+                              fontSize: 16,
                               color: Colors.red,
                               fontWeight: FontWeight.normal)
                           : TextStyles.miniText,
@@ -57,7 +58,8 @@ class ProfileTile extends StatelessWidget {
                     subtitle.isNotEmpty
                         ? Text(
                             subtitle,
-                            style: TextStyles.tileText,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyles.tileText.copyWith(fontSize: 14),
                           )
                         : const SizedBox(),
                   ],
