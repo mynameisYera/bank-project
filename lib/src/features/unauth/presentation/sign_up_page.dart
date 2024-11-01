@@ -20,19 +20,15 @@ class SignUpPage extends StatefulWidget {
 class _SignUpPageState extends State<SignUpPage> {
   final FirebaseAuthServices _auth = FirebaseAuthServices();
   // conrollers
-  final TextEditingController _teamController = TextEditingController();
-  final TextEditingController _firstPersonController = TextEditingController();
-  final TextEditingController _secondPersonController = TextEditingController();
-  final TextEditingController _thirdPersonController = TextEditingController();
+  final TextEditingController _cardController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
   void dispose() {
-    _teamController.dispose();
-    _firstPersonController.dispose();
-    _secondPersonController.dispose();
-    _thirdPersonController.dispose();
+    _cardController.dispose();
+    _phoneController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -41,130 +37,79 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.mainColor,
-      appBar: const CustomAppBar(
-        title: 'Finish signing up',
-        backgroundColor: AppColors.mainColor,
-        popAble: true,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // name of the team
-                Text('Name of the Team', style: TextStyles.headerText),
-                const SizedBox(height: 5),
-                CustomTextField(
-                  controller: _teamController,
-                  hintText: 'F troishniki',
-                  obscure: false,
-                ),
-                const SizedBox(height: 5),
-                Text('Make sure it matches the name from previous games.',
-                    style: TextStyles.miniText),
-                const SizedBox(height: 10),
-
-                // name of competitors
-                Text('Name of', style: TextStyles.headerText),
-                const SizedBox(height: 5),
-                CustomTextField(
-                    controller: _firstPersonController,
-                    hintText: 'First person',
-                    obscure: false),
-                const SizedBox(height: 7),
-                CustomTextField(
-                    controller: _secondPersonController,
-                    hintText: 'Second person',
-                    obscure: false),
-                const SizedBox(height: 7),
-                CustomTextField(
-                    controller: _thirdPersonController,
-                    hintText: 'Third person',
-                    obscure: false),
-                const SizedBox(height: 10),
-
-                // Email
-                Text('Email', style: TextStyles.headerText),
-                const SizedBox(height: 5),
-                CustomTextField(
-                    controller: _emailController,
-                    hintText: 'Email',
-                    obscure: false),
-                const SizedBox(height: 5),
-                Text(
-                  "We'll email you to trip confirmations and recepits.",
-                  style: TextStyles.miniText,
-                ),
-                const SizedBox(height: 10),
-
-                //  Password
-                Text('Password', style: TextStyles.headerText),
-                const SizedBox(height: 5),
-                CustomTextField(
-                  controller: _passwordController,
-                  hintText: 'Password',
-                  obscure: true,
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  "Password strength: strong \nCan't contain your name or email address \nAt least 8 characters \nContaines a number or symbol",
-                  style: TextStyles.miniText,
-                ),
-                const SizedBox(height: 10),
-
-                // button
-                CustomButtonGrey(
-                  onTap: () {},
-                  btnText: 'Pay',
-                  icon: SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: SvgPicture.asset(
-                      'assets/icons/google_icon.svg',
-                      fit: BoxFit.cover,
-                    ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // name of the team
+                  Text('Card Number', style: TextStyles.headerText),
+                  const SizedBox(height: 5),
+                  CustomTextField(
+                    controller: _cardController,
+                    hintText: '4400 0000 0000 0000',
+                    obscure: false,
                   ),
-                ),
-                const SizedBox(height: 5),
+                  const SizedBox(height: 5),
+                  Text('Make sure it matches with your real card number.',
+                      style: TextStyles.miniText),
+                  const SizedBox(height: 10),
 
-                RichText(
-                  text: TextSpan(
-                      text: "By selecting ",
-                      style: TextStyles.miniText,
-                      children: [
-                        TextSpan(
-                          text: "Agree and Continue ",
-                          style: TextStyles.boldMiniText,
-                        ),
-                        TextSpan(
-                            text: "below, I agree to 451's ",
-                            style: TextStyles.miniText),
-                        TextSpan(
-                            text: "Terms of Service,",
-                            style: TextStyles.underlineText),
-                        const TextSpan(text: " "),
-                        TextSpan(
-                            text: "Payments Terms of Service",
-                            style: TextStyles.underlineText),
-                        const TextSpan(text: " "),
-                        TextSpan(
-                            text: "Privacy Policy",
-                            style: TextStyles.underlineText),
-                        const TextSpan(text: " and "),
-                        TextSpan(
-                            text: "Nondiscrimination Policy.",
-                            style: TextStyles.underlineText),
-                      ]),
-                ),
-                const SizedBox(height: 10),
+                  // phone number
+                  Text('Phone Number', style: TextStyles.headerText),
+                  const SizedBox(height: 5),
+                  CustomTextField(
+                    controller: _phoneController,
+                    hintText: '+7 (999) 999 99 99',
+                    obscure: false,
+                  ),
+                  const SizedBox(height: 10),
 
-                // button
-                CustomButton(onTap: _signUp, btnText: "Agree to continue")
-              ],
-            ),
+                  // Email
+                  Text('Email', style: TextStyles.headerText),
+                  const SizedBox(height: 5),
+                  CustomTextField(
+                      controller: _emailController,
+                      hintText: 'Email',
+                      obscure: false),
+                  const SizedBox(height: 5),
+                  Text(
+                    "We'll email you to trip confirmations and recepits.",
+                    style: TextStyles.miniText,
+                  ),
+                  const SizedBox(height: 10),
+
+                  //  Password
+                  Text('Password', style: TextStyles.headerText),
+                  const SizedBox(height: 5),
+                  CustomTextField(
+                    controller: _passwordController,
+                    hintText: 'Password',
+                    obscure: true,
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
+                    "Password strength: strong \nCan't contain your name or email address \nAt least 8 characters \nContaines a number or symbol",
+                    style: TextStyles.miniText,
+                  ),
+                  const SizedBox(height: 10),
+                ],
+              ),
+
+              //
+              CustomButton(
+                onTap: () {},
+                btnText: 'Register',
+              ),
+            ],
           ),
         ),
       ),
@@ -174,15 +119,11 @@ class _SignUpPageState extends State<SignUpPage> {
   void _signUp() async {
     String password = _passwordController.text;
     String emailAddress = _emailController.text;
-    String teamName = _teamController.text;
-    List<String> memberNames = [
-      _firstPersonController.text,
-      _secondPersonController.text,
-      _thirdPersonController.text
-    ];
+    String cardNumber = _cardController.text;
+    String phoneNumber = _phoneController.text;
 
     User? user = await _auth.signUpWithEmailAndPassword(
-        emailAddress, password, teamName, memberNames);
+        emailAddress, password, cardNumber, phoneNumber);
 
     if (user != null) {
       print('signed in');

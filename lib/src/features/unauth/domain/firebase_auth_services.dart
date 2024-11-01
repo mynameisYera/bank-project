@@ -46,7 +46,7 @@ class FirebaseAuthServices {
   }
 
   Future<User?> signUpWithEmailAndPassword(String emailAddress, String password,
-      String teamName, List<String> memberNames) async {
+      String cardNumber, String phoneNumber) async {
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: emailAddress,
@@ -57,9 +57,9 @@ class FirebaseAuthServices {
       if (user != null) {
         await _firestore.collection('users').doc(user.uid).set({
           'email': emailAddress,
-          'teamName': teamName,
-          'memberNames': memberNames,
-          'score': 0,
+          'cardNumber': cardNumber,
+          'phoneNumber': phoneNumber,
+          'money': 0,
         });
       }
       return user;

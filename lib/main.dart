@@ -14,23 +14,6 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   runApp(MyApp());
-  // try {
-  //   await Firebase.initializeApp();
-  //   print('success');
-  //   runApp(MyApp());
-  // } catch (e) {
-  //   await Firebase.initializeApp(
-  //     options: FirebaseOptions(
-  //       apiKey: 'AIzaSyCxvRrP1HzqRvhwg9FzAluR2zqFDTAFpko',
-  //       appId: '1:660203016448:web:706d920decec3e5ab7a3e5',
-  //       messagingSenderId: '660203016448',
-  //       projectId: 'gradus-1eb02',
-  //       authDomain: 'gradus-1eb02.firebaseapp.com',
-  //       storageBucket: 'gradus-1eb02.appspot.com',
-  //     ),
-  //   );
-  //   print("Error initializing Firebase: $e");
-  // }
 
   GetIt.instance.registerLazySingleton<MessageBloc>(() => MessageBloc());
   GetIt.instance.registerLazySingleton<NextBookBloc>(() => NextBookBloc());

@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gradus/src/core/colors/app_colors.dart';
-import 'package:gradus/src/core/widgets/custom_appbar.dart';
 import 'package:gradus/src/core/widgets/custom_button.dart';
 import 'package:gradus/src/core/widgets/custom_text_field.dart';
 import 'package:gradus/src/features/admin/presentation/pages/admin_home.dart';
@@ -35,11 +34,6 @@ class _LogInPageState extends State<LogInPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.mainColor,
-      appBar: const CustomAppBar(
-        title: 'Log in or sign Up',
-        backgroundColor: AppColors.mainColor,
-        popAble: false,
-      ),
       body: SingleChildScrollView(
         child: Container(
           height: MediaQuery.of(context).size.height - 50,
@@ -52,13 +46,13 @@ class _LogInPageState extends State<LogInPage> {
                 children: [
                   // name of the team
                   Text(
-                    'Your email address',
+                    'Phone number',
                     style: TextStyles.headerText,
                   ),
                   const SizedBox(height: 5),
                   CustomTextField(
                     controller: _teamController,
-                    hintText: 'Email',
+                    hintText: '+7 (999) 999 99 99',
                     obscure: false,
                   ),
                   const SizedBox(height: 10),

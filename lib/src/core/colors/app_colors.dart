@@ -1,10 +1,10 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 
 class AppColors {
   //main color black not too
-  static const Color mainColor = Color(0xff121212);
+  static const Color mainColor = Colors.white;
   //orange button colors
-  static const Color buttonColor = Color(0xffDC712D);
+  static const Color buttonColor = Color(0xff329F00);
   //secondary section color
   static const Color sectionColor = Color(0xff161616);
   //blue color
