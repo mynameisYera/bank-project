@@ -2,13 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:gradus/src/core/colors/app_colors.dart';
-import 'package:gradus/src/features/main/presentation/bloc/current_bloc/current_bloc.dart';
-import 'package:gradus/src/features/main/presentation/bloc/message_bloc/message_bloc.dart';
-import 'package:gradus/src/features/main/presentation/bloc/news_bloc/news_bloc.dart';
-import 'package:gradus/src/features/main/presentation/bloc/next_book_bloc/next_book_bloc.dart';
-import 'package:gradus/src/features/main/presentation/pages/main_page.dart';
-import 'package:gradus/src/features/unauth/presentation/log_in_page.dart';
+import 'package:bank/src/core/colors/app_colors.dart';
+import 'package:bank/src/features/main/presentation/bloc/current_bloc/current_bloc.dart';
+import 'package:bank/src/features/main/presentation/bloc/message_bloc/message_bloc.dart';
+import 'package:bank/src/features/main/presentation/bloc/news_bloc/news_bloc.dart';
+import 'package:bank/src/features/main/presentation/bloc/next_book_bloc/next_book_bloc.dart';
+import 'package:bank/src/features/main/presentation/pages/main_page.dart';
+import 'package:bank/src/features/unauth/presentation/log_in_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

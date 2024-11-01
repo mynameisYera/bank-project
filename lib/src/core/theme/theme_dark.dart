@@ -1,5 +1,5 @@
 // import 'package:flutter/material.dart';
-// import 'package:gradus/src/core/colors/app_colors.dart';
+// import 'package:bank/src/core/colors/app_colors.dart';
 
 // ThemeData darkMode = ThemeData(
 //     colorScheme: ColorScheme.dark(

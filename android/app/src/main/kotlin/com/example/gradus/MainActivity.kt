@@ -1,4 +1,4 @@
-package com.example.gradus
+package com.example.bank
 
 import io.flutter.embedding.android.FlutterActivity
 

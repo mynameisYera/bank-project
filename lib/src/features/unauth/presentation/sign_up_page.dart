@@ -1,14 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gradus/src/core/colors/app_colors.dart';
-import 'package:gradus/src/core/theme/text_theme.dart';
-import 'package:gradus/src/core/widgets/custom_appbar.dart';
-import 'package:gradus/src/core/widgets/custom_button.dart';
-import 'package:gradus/src/core/widgets/custom_button_grey.dart';
-import 'package:gradus/src/core/widgets/custom_text_field.dart';
-import 'package:gradus/src/features/main/presentation/pages/main_page.dart';
-import 'package:gradus/src/features/unauth/domain/firebase_auth_services.dart';
+import 'package:bank/src/core/colors/app_colors.dart';
+import 'package:bank/src/core/theme/text_theme.dart';
+import 'package:bank/src/core/widgets/custom_appbar.dart';
+import 'package:bank/src/core/widgets/custom_button.dart';
+import 'package:bank/src/core/widgets/custom_button_grey.dart';
+import 'package:bank/src/core/widgets/custom_text_field.dart';
+import 'package:bank/src/features/main/presentation/pages/main_page.dart';
+import 'package:bank/src/features/unauth/domain/firebase_auth_services.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
