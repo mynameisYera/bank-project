@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:gradus/src/core/colors/app_colors.dart';
-import 'package:gradus/src/core/theme/text_theme.dart';
+import 'package:bank/src/core/colors/app_colors.dart';
+import 'package:bank/src/core/theme/text_theme.dart';
 
 class NewsWidget extends StatelessWidget {
   final List<String> url;
@@ -37,7 +37,7 @@ class NewsWidget extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      '451.gradus.official',
+                      '451.bank.official',
                       style: TextStyles.headerText.copyWith(fontSize: 20),
                     ),
                     Text(

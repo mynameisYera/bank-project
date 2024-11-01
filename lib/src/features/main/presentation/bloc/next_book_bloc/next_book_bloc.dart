@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:gradus/src/features/main/domain/next_book_entity.dart';
+import 'package:bank/src/features/main/domain/next_book_entity.dart';
 
 part 'next_book_event.dart';
 part 'next_book_state.dart';

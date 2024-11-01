@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:gradus/src/core/colors/app_colors.dart';
-import 'package:gradus/src/core/theme/text_theme.dart';
+import 'package:bank/src/core/colors/app_colors.dart';
+import 'package:bank/src/core/theme/text_theme.dart';
 
 class CurrentBookWidget extends StatelessWidget {
   final String image;

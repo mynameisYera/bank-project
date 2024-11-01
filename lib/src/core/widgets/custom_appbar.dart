@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gradus/src/core/theme/text_theme.dart';
+import 'package:bank/src/core/theme/text_theme.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;

@@ -1,7 +1,7 @@
 import 'package:bloc/bloc.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
-import 'package:gradus/src/features/main/domain/messages_entity.dart';
+import 'package:bank/src/features/main/domain/messages_entity.dart';
 
 part 'message_event.dart';
 part 'message_state.dart';
