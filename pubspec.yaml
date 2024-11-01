@@ -21,6 +21,7 @@ dependencies:
   intl: ^0.18.1
   carousel_slider: ^5.0.0
   easy_quiz_game: ^1.0.1
+  flutter_windowmanager: ^0.2.0
 
 dev_dependencies:
   flutter_test:
