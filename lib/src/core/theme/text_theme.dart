@@ -9,7 +9,7 @@ class TextStyles {
       fontSize: 20, color: Colors.black, fontWeight: FontWeight.w400);
   //simple  text style
   static TextStyle simpleText = const TextStyle(
-      fontSize: 20, color: Colors.white, fontWeight: FontWeight.w300);
+      fontSize: 20, color: Colors.black, fontWeight: FontWeight.w300);
   // mini text
   static TextStyle miniText = const TextStyle(
       fontSize: 14, color: Color(0xff868686), fontWeight: FontWeight.normal);

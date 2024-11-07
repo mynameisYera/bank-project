@@ -27,7 +27,7 @@ class CustomButton extends StatelessWidget {
         ),
         child: Text(
           btnText,
-          style: TextStyles.simpleText,
+          style: TextStyles.simpleText.copyWith(color: Colors.white),
         ),
       ),
     );
