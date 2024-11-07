@@ -47,6 +47,7 @@ class FirebaseAuthServices {
 
   Future<User?> signUpWithEmailAndPassword(String emailAddress, String password,
       String cardNumber, String phoneNumber) async {
+    print('started regh');
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: emailAddress,
@@ -61,16 +62,21 @@ class FirebaseAuthServices {
           'phoneNumber': phoneNumber,
           'money': 0,
         });
+        print('sended');
       }
       return user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');
+        return null;
       } else if (e.code == 'email-already-in-use') {
         print('The account already exists for that email.');
+        return null;
       }
     } catch (e) {
       print(e);
+      return null;
     }
+    return null;
   }
 }
