@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class CardWidget extends StatelessWidget {
   final String name;
   final String number;
-  final double money;
+  final int money;
   const CardWidget(
       {super.key,
       required this.name,
@@ -13,6 +13,7 @@ class CardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String numbers = number.substring(number.length - 4);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
       child: Container(
@@ -83,7 +84,7 @@ class CardWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    '•••• •••• •••• $number',
+                    '•••• •••• •••• $numbers',
                     style: TextStyles.headerText
                         .copyWith(color: Color(0xff272A32), fontSize: 20),
                   ),

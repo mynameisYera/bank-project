@@ -46,7 +46,7 @@ class FirebaseAuthServices {
   }
 
   Future<User?> signUpWithEmailAndPassword(String emailAddress, String password,
-      String cardNumber, String phoneNumber) async {
+      String cardNumber, String phoneNumber, String username) async {
     print('started regh');
     try {
       UserCredential credential = await _auth.createUserWithEmailAndPassword(
@@ -61,6 +61,7 @@ class FirebaseAuthServices {
           'cardNumber': cardNumber,
           'phoneNumber': phoneNumber,
           'money': 0,
+          'username': username
         });
         print('sended');
       }

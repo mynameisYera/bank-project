@@ -6,25 +6,29 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Color backgroundColor;
   final List<Widget>? actions;
   final bool popAble;
+  final Color? color;
+  final Color? iconColor;
   const CustomAppBar({
     super.key,
     required this.title,
     required this.backgroundColor,
     this.actions,
     required this.popAble,
+    this.color,
+    this.iconColor,
   });
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: Text(
         title,
-        style: TextStyles.headerText,
+        style: TextStyles.headerText.copyWith(color: color),
       ),
       leading: popAble
           ? IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_new,
-                color: Colors.black,
+                color: iconColor ?? Colors.black,
               ),
               iconSize: 16,
               onPressed: () {

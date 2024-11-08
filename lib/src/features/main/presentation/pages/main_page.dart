@@ -1,4 +1,5 @@
 import 'package:bank/src/core/theme/text_theme.dart';
+import 'package:bank/src/features/coins/crypto_list/views/crypto_list_screen.dart';
 import 'package:bank/src/features/main/widgets/card_widget.dart';
 import 'package:bank/src/features/main/widgets/finance_widget.dart';
 import 'package:bank/src/features/main/widgets/transactions_widget.dart';
@@ -7,6 +8,8 @@ import 'package:bank/src/features/services/presentation/payment_page.dart';
 import 'package:bank/src/features/services/presentation/services_page.dart';
 import 'package:bank/src/features/services/presentation/transfer_page.dart';
 import 'package:bank/src/features/transactions/presentation/transactions_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
 
@@ -24,7 +27,7 @@ class _NavPageState extends State<NavPage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    ProfilePage(),
+    HomePage(),
     const QrCodePage(),
     TransactionsPage(),
     const ServicesPage(),
@@ -107,12 +110,31 @@ class _NavPageState extends State<NavPage> {
   }
 }
 
-class ProfilePage extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
-  _ProfilePageState createState() => _ProfilePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _HomePageState extends State<HomePage> {
+  Map<String, dynamic>? userData;
+  List<dynamic> transactions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    final data = await getUserData();
+    if (data != null) {
+      setState(() {
+        userData = data;
+        transactions = userData?['transactions'] ?? [];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Map<String, dynamic>> finance = [
@@ -132,10 +154,10 @@ class _ProfilePageState extends State<ProfilePage> {
       },
       {
         "color": Color(0xffAA9EB7),
-        "text": 'News',
+        "text": 'Invest',
         "icon": SvgPicture.asset('assets/icons/statistic.svg'),
-        "onTap": () => Navigator.push(
-            context, MaterialPageRoute(builder: (context) => TransferPage())),
+        "onTap": () => Navigator.push(context,
+            MaterialPageRoute(builder: (context) => CryptoListScreen())),
       },
       {
         "color": Color(0xffF2FE8D),
@@ -152,6 +174,7 @@ class _ProfilePageState extends State<ProfilePage> {
             context, MaterialPageRoute(builder: (context) => PaymentPage())),
       },
     ];
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Padding(
@@ -159,15 +182,13 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 30,
-                ),
+                SizedBox(height: 30),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Your balance',
-                      style: TextStyles.simpleText.copyWith(
+                      style: TextStyle(
                           color: AppColors.sectionColor,
                           fontWeight: FontWeight.w400),
                     ),
@@ -183,26 +204,20 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   ],
                 ),
-                SizedBox(
-                  height: 20,
-                ),
+                SizedBox(height: 20),
                 CardWidget(
-                  money: 12000,
-                  name: 'Yernasip Duisebay',
-                  number: '6574',
+                  money: userData?['money'] ?? 0,
+                  name: userData?['username'] ?? 'User',
+                  number: userData?['phoneNumber'] ?? '0000',
                 ),
-                SizedBox(
-                  height: 45,
-                ),
+                SizedBox(height: 45),
                 Text(
                   'Finance',
-                  style: TextStyles.simpleText.copyWith(
+                  style: TextStyle(
                       color: AppColors.sectionColor,
                       fontWeight: FontWeight.w400),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
                 SizedBox(
                   height: 100,
                   child: ListView.builder(
@@ -216,16 +231,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                 color: finance[index]['color'],
                                 widget: finance[index]['icon'],
                                 name: finance[index]['text']),
-                            SizedBox(
-                              width: 14,
-                            )
+                            SizedBox(width: 14)
                           ],
                         );
                       }),
                 ),
-                SizedBox(
-                  height: 30,
-                ),
+                SizedBox(height: 30),
                 Container(
                   width: double.infinity,
                   height: 500,
@@ -241,22 +252,21 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         Text(
                           'Transactions',
-                          style: TextStyles.simpleText.copyWith(
+                          style: TextStyle(
                               color: AppColors.sectionColor,
                               fontWeight: FontWeight.w400),
                         ),
-                        SizedBox(
-                          height: 20,
-                        ),
+                        SizedBox(height: 20),
                         Expanded(
                           child: ListView.builder(
-                            itemCount: 50,
+                            itemCount: transactions.length,
                             itemBuilder: (context, index) {
+                              final transaction = transactions[index];
                               return TransactionsWidget(
-                                name: '',
-                                isOut: false,
-                                number: '8-705-744-2222',
-                                money: -2300,
+                                name: transaction['to'] ?? 'Unknown',
+                                isOut: transaction['money'] < 0,
+                                number: transaction['to'] ?? 'Unknown',
+                                money: transaction['money'] ?? 0,
                               );
                             },
                           ),
@@ -269,5 +279,31 @@ class _ProfilePageState extends State<ProfilePage> {
             )),
       ),
     );
+  }
+
+  Future<Map<String, dynamic>?> getUserData() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        print('User is not authenticated');
+        return null;
+      }
+
+      final userUid = user.uid;
+      final DocumentSnapshot userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userUid)
+          .get();
+
+      if (userDoc.exists) {
+        return userDoc.data() as Map<String, dynamic>?;
+      } else {
+        print('User document does not exist in Firestore');
+        return null;
+      }
+    } catch (e) {
+      print('Error retrieving user data: $e');
+      return null;
+    }
   }
 }

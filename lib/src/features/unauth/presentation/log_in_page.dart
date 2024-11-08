@@ -49,22 +49,22 @@ class _LogInPageState extends State<LogInPage> {
                   children: [
                     // Phone number field
                     Text(
-                      'Phone number',
+                      'Email',
                       style: TextStyles.headerText,
                     ),
                     const SizedBox(height: 5),
                     CustomTextField(
                       controller: _teamController,
-                      hintText: '+7 (777) 777 77 77',
+                      hintText: 'example@gmail.com',
                       obscure: false,
-                      keyboardType: TextInputType.number,
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Phone number is required';
+                          return 'Email is required';
                         }
-                        final regex = RegExp(r'^(?:\+7|8)?7\d{9}$');
+                        final regex = RegExp(
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
                         if (!regex.hasMatch(value)) {
-                          return 'Enter a valid phone number';
+                          return 'Enter a valid email address';
                         }
 
                         return null;

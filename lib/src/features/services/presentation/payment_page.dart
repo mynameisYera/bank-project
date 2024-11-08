@@ -1,7 +1,9 @@
 import 'package:bank/src/core/colors/app_colors.dart';
 import 'package:bank/src/core/theme/text_theme.dart';
 import 'package:bank/src/core/widgets/custom_appbar.dart';
+import 'package:bank/src/features/main/presentation/pages/profile_page.dart';
 import 'package:bank/src/features/qr/presentation/qr_not_page.dart';
+import 'package:bank/src/features/services/presentation/communal_page.dart';
 import 'package:flutter/material.dart';
 
 class PaymentPage extends StatelessWidget {
@@ -37,7 +39,7 @@ class PaymentPage extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => QrNotPage()));
+                                builder: (context) => ProfilePage()));
                       },
                       child: Container(
                         color: Colors.transparent,
@@ -52,7 +54,10 @@ class PaymentPage extends StatelessWidget {
             ),
           ),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => CommunalPage()));
+            },
             child: ListTile(
               leading: Container(
                 width: 50,

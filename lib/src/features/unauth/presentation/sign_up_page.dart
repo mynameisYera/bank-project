@@ -24,6 +24,8 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
@@ -97,6 +99,20 @@ class _SignUpPageState extends State<SignUpPage> {
                         },
                       ),
                       const SizedBox(height: 10),
+                      Text('Name', style: TextStyles.headerText),
+                      const SizedBox(height: 5),
+                      CustomTextField(
+                        controller: _usernameController,
+                        hintText: 'Vasiya Pupkin',
+                        obscure: false,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please write your name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 5),
 
                       // Email
                       Text('Email', style: TextStyles.headerText),
@@ -173,9 +189,10 @@ class _SignUpPageState extends State<SignUpPage> {
     String emailAddress = _emailController.text;
     String cardNumber = _cardController.text;
     String phoneNumber = _phoneController.text;
+    String usernameNumber = _usernameController.text;
 
     User? user = await _auth.signUpWithEmailAndPassword(
-        emailAddress, password, cardNumber, phoneNumber);
+        emailAddress, password, cardNumber, phoneNumber, usernameNumber);
 
     if (user != null) {
       print('signed in');

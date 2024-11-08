@@ -13,7 +13,6 @@ class EveryCheckPage extends StatefulWidget {
 }
 
 class _EveryCheckPageState extends State<EveryCheckPage> {
-  // Calculator variables
   String output = '';
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 

@@ -8,14 +8,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class TransactionsPage extends StatefulWidget {
-  const TransactionsPage({super.key});
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
 
   @override
-  _TransactionsPageState createState() => _TransactionsPageState();
+  _ProfilePageState createState() => _ProfilePageState();
 }
 
-class _TransactionsPageState extends State<TransactionsPage> {
+class _ProfilePageState extends State<ProfilePage> {
   String _username = "Loading...";
   List<dynamic> _transactions = [];
 
@@ -69,14 +69,76 @@ class _TransactionsPageState extends State<TransactionsPage> {
           )
         : Scaffold(
             appBar: CustomAppBar(
-              title: 'Transactions',
+              title: 'Profile',
               backgroundColor: AppColors.buttonColor,
               color: Colors.white,
               iconColor: Colors.white,
-              popAble: false,
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.logout),
+                  color: AppColors.mainColor,
+                  onPressed: () async {
+                    try {
+                      await FirebaseAuth.instance.signOut();
+                      Navigator.pushReplacement(context,
+                          MaterialPageRoute(builder: (context) => LogInPage()));
+                    } catch (e) {
+                      print('Error logging out: $e');
+                    }
+                  },
+                )
+              ],
+              popAble: true,
             ),
             body: Column(
               children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: <Widget>[
+                    Container(
+                      width: double.infinity,
+                      height: 90,
+                      color: AppColors.buttonColor,
+                    ),
+                    Positioned(
+                        bottom: -45,
+                        left: MediaQuery.of(context).size.width / 2 - 45,
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundImage:
+                              AssetImage('assets/images/profile.jpg'),
+                        )),
+                    Container(
+                      width: double.infinity,
+                      height: 50,
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 50,
+                ),
+                Text(
+                  _username,
+                  style: TextStyles.headerText,
+                ),
+                Divider(),
+                ListTile(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PutEveryPassPage()));
+                  },
+                  title: Text(
+                    'Change access code',
+                    style: TextStyles.tileText.copyWith(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black),
+                  ),
+                  trailing: Icon(Icons.arrow_forward_ios),
+                ),
+                Divider(),
                 Expanded(
                   child: ListView.builder(
                     itemCount: _transactions.length,

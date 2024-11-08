@@ -46,13 +46,13 @@ class TransactionsWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Transfer',
+                  name,
                   style: TextStyles.simpleText.copyWith(
                       color: AppColors.sectionColor,
                       fontWeight: FontWeight.w400),
                 ),
                 Text(
-                  '8-705-740-2142',
+                  number,
                   style: TextStyles.miniText,
                 )
               ],
